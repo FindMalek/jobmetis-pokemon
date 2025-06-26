@@ -46,12 +46,20 @@ export class BattleEngineService {
   static initializeBattle(team1: TeamRo, team2: TeamRo): BattleState {
     try {
       console.log("🔧 Initializing battle with teams:", {
-        team1: { id: team1.id, name: team1.name, membersCount: team1.members.length },
-        team2: { id: team2.id, name: team2.name, membersCount: team2.members.length },
+        team1: {
+          id: team1.id,
+          name: team1.name,
+          membersCount: team1.members.length,
+        },
+        team2: {
+          id: team2.id,
+          name: team2.name,
+          membersCount: team2.members.length,
+        },
       })
 
       const battleId = `battle_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      
+
       const battleState = {
         id: battleId,
         team1: this.initializeBattleTeam(team1),
@@ -68,7 +76,9 @@ export class BattleEngineService {
       return battleState
     } catch (error) {
       console.error("💥 Error initializing battle:", error)
-      throw new Error(`Failed to initialize battle: ${error instanceof Error ? error.message : "Unknown error"}`)
+      throw new Error(
+        `Failed to initialize battle: ${error instanceof Error ? error.message : "Unknown error"}`
+      )
     }
   }
 
@@ -77,14 +87,18 @@ export class BattleEngineService {
    */
   private static initializeBattleTeam(team: TeamRo): BattleTeam {
     try {
-      console.log(`🎯 Initializing battle team: ${team.name} (${team.members.length} members)`)
-      
+      console.log(
+        `🎯 Initializing battle team: ${team.name} (${team.members.length} members)`
+      )
+
       if (!team.members || team.members.length === 0) {
         throw new Error(`Team ${team.name} has no members`)
       }
 
       if (team.members.length !== 6) {
-        throw new Error(`Team ${team.name} must have exactly 6 members, has ${team.members.length}`)
+        throw new Error(
+          `Team ${team.name} must have exactly 6 members, has ${team.members.length}`
+        )
       }
 
       const battleTeam = {
@@ -92,13 +106,22 @@ export class BattleEngineService {
         name: team.name,
         pokemon: team.members.map((pokemon, index) => {
           if (!pokemon) {
-            throw new Error(`Team ${team.name} has null/undefined member at position ${index}`)
+            throw new Error(
+              `Team ${team.name} has null/undefined member at position ${index}`
+            )
           }
           if (!pokemon.id || !pokemon.name) {
-            throw new Error(`Team ${team.name} has invalid member at position ${index}: missing id or name`)
+            throw new Error(
+              `Team ${team.name} has invalid member at position ${index}: missing id or name`
+            )
           }
-          if (typeof pokemon.power !== 'number' || typeof pokemon.life !== 'number') {
-            throw new Error(`Team ${team.name} member ${pokemon.name} has invalid power/life values`)
+          if (
+            typeof pokemon.power !== "number" ||
+            typeof pokemon.life !== "number"
+          ) {
+            throw new Error(
+              `Team ${team.name} member ${pokemon.name} has invalid power/life values`
+            )
           }
 
           return {
@@ -132,10 +155,12 @@ export class BattleEngineService {
     typeEffectiveness: number = 1.0
   ): number {
     try {
-      if (typeof attacker.power !== 'number') {
-        throw new Error(`Attacker ${attacker.name} has invalid power: ${attacker.power}`)
+      if (typeof attacker.power !== "number") {
+        throw new Error(
+          `Attacker ${attacker.name} has invalid power: ${attacker.power}`
+        )
       }
-      if (typeof typeEffectiveness !== 'number' || typeEffectiveness < 0) {
+      if (typeof typeEffectiveness !== "number" || typeEffectiveness < 0) {
         throw new Error(`Invalid type effectiveness: ${typeEffectiveness}`)
       }
 
@@ -143,7 +168,7 @@ export class BattleEngineService {
       const baseDamage = attacker.power * typeEffectiveness
       const randomFactor = 0.85 + Math.random() * 0.3 // 85-115% variance
       const finalDamage = Math.floor(baseDamage * randomFactor)
-      
+
       return Math.max(1, finalDamage) // Minimum 1 damage
     } catch (error) {
       console.error("💥 Error calculating damage:", error)
@@ -156,13 +181,13 @@ export class BattleEngineService {
    */
   static applyDamage(pokemon: BattlePokemon, damage: number): BattlePokemon {
     try {
-      if (typeof damage !== 'number' || damage < 0) {
+      if (typeof damage !== "number" || damage < 0) {
         throw new Error(`Invalid damage value: ${damage}`)
       }
 
       const newCurrentLife = Math.max(0, pokemon.currentLife - damage)
       const isDefeated = newCurrentLife === 0
-      
+
       return {
         ...pokemon,
         currentLife: newCurrentLife,
@@ -186,19 +211,26 @@ export class BattleEngineService {
       }
 
       if (team.currentPokemonIndex >= team.pokemon.length) {
-        console.warn(`Team ${team.name} currentPokemonIndex ${team.currentPokemonIndex} is out of bounds`)
+        console.warn(
+          `Team ${team.name} currentPokemonIndex ${team.currentPokemonIndex} is out of bounds`
+        )
         return null
       }
-      
+
       const pokemon = team.pokemon[team.currentPokemonIndex]
       if (!pokemon) {
-        console.warn(`Team ${team.name} has null Pokemon at index ${team.currentPokemonIndex}`)
+        console.warn(
+          `Team ${team.name} has null Pokemon at index ${team.currentPokemonIndex}`
+        )
         return null
       }
 
       return pokemon.isDefeated ? null : pokemon
     } catch (error) {
-      console.error(`💥 Error getting active Pokemon for team ${team.name}:`, error)
+      console.error(
+        `💥 Error getting active Pokemon for team ${team.name}:`,
+        error
+      )
       return null
     }
   }
@@ -209,7 +241,7 @@ export class BattleEngineService {
   static switchToNextPokemon(team: BattleTeam): BattleTeam {
     try {
       let nextIndex = team.currentPokemonIndex + 1
-      
+
       // Find next non-defeated Pokemon
       while (
         nextIndex < team.pokemon.length &&
@@ -217,13 +249,17 @@ export class BattleEngineService {
       ) {
         nextIndex++
       }
-      
+
       const defeatedCount = team.pokemon.filter((p) => p.isDefeated).length
       const isDefeated = nextIndex >= team.pokemon.length
-      
+
+      // If team is defeated, keep currentPokemonIndex at last valid index (5)
+      // to satisfy schema validation (max 5)
+      const finalIndex = isDefeated ? team.pokemon.length - 1 : nextIndex
+
       return {
         ...team,
-        currentPokemonIndex: nextIndex,
+        currentPokemonIndex: finalIndex,
         defeatedCount,
         isDefeated,
       }
@@ -243,10 +279,10 @@ export class BattleEngineService {
   ): BattleState {
     try {
       console.log(`⚔️ Executing round ${battleState.currentRound}`)
-      
+
       const pokemon1 = this.getActivePokemon(battleState.team1)
       const pokemon2 = this.getActivePokemon(battleState.team2)
-      
+
       if (!pokemon1 || !pokemon2) {
         console.log("🏁 Battle ending: no active Pokemon")
         return { ...battleState, isComplete: true }
@@ -266,7 +302,9 @@ export class BattleEngineService {
         type2Effectiveness
       )
 
-      console.log(`💥 Damage: ${pokemon1.name} deals ${damage1to2}, ${pokemon2.name} deals ${damage2to1}`)
+      console.log(
+        `💥 Damage: ${pokemon1.name} deals ${damage1to2}, ${pokemon2.name} deals ${damage2to1}`
+      )
 
       // Apply damage
       const updatedPokemon1 = this.applyDamage(pokemon1, damage2to1)
@@ -275,7 +313,7 @@ export class BattleEngineService {
       // Update team states
       let updatedTeam1 = { ...battleState.team1 }
       let updatedTeam2 = { ...battleState.team2 }
-      
+
       updatedTeam1.pokemon[updatedTeam1.currentPokemonIndex] = updatedPokemon1
       updatedTeam2.pokemon[updatedTeam2.currentPokemonIndex] = updatedPokemon2
 
@@ -364,8 +402,13 @@ export class BattleEngineService {
         battleDuration: Date.now() - battleState.startTime,
       }
     } catch (error) {
-      console.error(`💥 Error executing round ${battleState.currentRound}:`, error)
-      throw new Error(`Round execution failed: ${error instanceof Error ? error.message : "Unknown error"}`)
+      console.error(
+        `💥 Error executing round ${battleState.currentRound}:`,
+        error
+      )
+      throw new Error(
+        `Round execution failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      )
     }
   }
 
@@ -413,15 +456,15 @@ export class BattleEngineService {
   ): Promise<BattleState> {
     try {
       console.log("🚀 Starting complete battle simulation")
-      
+
       let battleState = this.initializeBattle(team1, team2)
-      
+
       while (!battleState.isComplete && battleState.currentRound <= 50) {
         const pokemon1 = this.getActivePokemon(battleState.team1)
         const pokemon2 = this.getActivePokemon(battleState.team2)
-        
+
         if (!pokemon1 || !pokemon2) break
-        
+
         const effectiveness1to2 = await getTypeEffectiveness(
           pokemon1.type.id,
           pokemon2.type.id
@@ -430,27 +473,29 @@ export class BattleEngineService {
           pokemon2.type.id,
           pokemon1.type.id
         )
-        
+
         battleState = this.executeRound(
           battleState,
           effectiveness1to2,
           effectiveness2to1
         )
-        
+
         // Add small delay for realistic battle pacing
         await new Promise((resolve) => setTimeout(resolve, 10))
       }
-      
+
       console.log("🏁 Battle simulation complete:", {
         winner: battleState.winner,
         rounds: battleState.rounds.length,
         duration: battleState.battleDuration,
       })
-      
+
       return battleState
     } catch (error) {
       console.error("💥 Error in complete battle simulation:", error)
-      throw new Error(`Battle simulation failed: ${error instanceof Error ? error.message : "Unknown error"}`)
+      throw new Error(
+        `Battle simulation failed: ${error instanceof Error ? error.message : "Unknown error"}`
+      )
     }
   }
 }

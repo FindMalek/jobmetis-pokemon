@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useMemo, useState } from "react"
 import { usePokemon, usePokemonTypes } from "@/orpc/hooks"
+import type { PokemonQueryDto, PokemonRo } from "@/schemas/pokemon"
+
 import { useDebouncedSearch } from "@/hooks/use-debounced-value"
-import type { PokemonQueryDto } from "@/schemas/pokemon"
-import type { PokemonRo } from "@/schemas/pokemon"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -29,28 +29,36 @@ export function PokemonList() {
   const debouncedSearch = useDebouncedSearch(localFilters.search || "", 500)
 
   // API filters - only trigger refetch when debounced values change
-  const apiFilters = useMemo(() => ({
-    search: debouncedSearch,
-    typeId: localFilters.typeId,
-    minPower: localFilters.minPower,
-    maxPower: localFilters.maxPower,
-    orderBy: localFilters.orderBy,
-    page: 1, // Always fetch first page for now
-    limit: 100, // Fetch larger set for client-side filtering
-  }), [
-    debouncedSearch,
-    localFilters.typeId,
-    localFilters.minPower,
-    localFilters.maxPower,
-    localFilters.orderBy,
-  ])
+  const apiFilters = useMemo(
+    () => ({
+      search: debouncedSearch,
+      typeId: localFilters.typeId,
+      minPower: localFilters.minPower,
+      maxPower: localFilters.maxPower,
+      orderBy: localFilters.orderBy,
+      page: 1, // Always fetch first page for now
+      limit: 100, // Fetch larger set for client-side filtering
+    }),
+    [
+      debouncedSearch,
+      localFilters.typeId,
+      localFilters.minPower,
+      localFilters.maxPower,
+      localFilters.orderBy,
+    ]
+  )
 
-  const { data: pokemonData, isLoading: pokemonLoading } = usePokemon(apiFilters)
+  const { data: pokemonData, isLoading: pokemonLoading } =
+    usePokemon(apiFilters)
   const { data: types } = usePokemonTypes()
 
   // Client-side filtering and pagination for instant feedback
   const filteredAndPaginatedPokemon = useMemo(() => {
-    if (!pokemonData?.data) return { data: [], pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0 } }
+    if (!pokemonData?.data)
+      return {
+        data: [],
+        pagination: { page: 1, limit: 12, totalCount: 0, totalPages: 0 },
+      }
 
     let filtered = pokemonData.data
 
@@ -64,15 +72,21 @@ export function PokemonList() {
 
     // Apply type filter
     if (localFilters.typeId && localFilters.typeId !== "all") {
-      filtered = filtered.filter((pokemon: PokemonRo) => pokemon.type.id === localFilters.typeId)
+      filtered = filtered.filter(
+        (pokemon: PokemonRo) => pokemon.type.id === localFilters.typeId
+      )
     }
 
     // Apply power range filters
     if (localFilters.minPower) {
-      filtered = filtered.filter((pokemon: PokemonRo) => pokemon.power >= localFilters.minPower!)
+      filtered = filtered.filter(
+        (pokemon: PokemonRo) => pokemon.power >= localFilters.minPower!
+      )
     }
     if (localFilters.maxPower) {
-      filtered = filtered.filter((pokemon: PokemonRo) => pokemon.power <= localFilters.maxPower!)
+      filtered = filtered.filter(
+        (pokemon: PokemonRo) => pokemon.power <= localFilters.maxPower!
+      )
     }
 
     // Apply sorting
@@ -138,8 +152,9 @@ export function PokemonList() {
     <div className="space-y-6">
       {/* Performance indicator */}
       {localFilters.search && localFilters.search !== debouncedSearch && (
-        <div className="text-xs text-muted-foreground text-center py-2 bg-blue-50 rounded-lg">
-          🔍 Instant search active • Full search in {Math.max(0, 500 - (localFilters.search.length * 50))}ms
+        <div className="text-muted-foreground rounded-lg bg-blue-50 py-2 text-center text-xs">
+          🔍 Instant search active • Full search in{" "}
+          {Math.max(0, 500 - localFilters.search.length * 50)}ms
         </div>
       )}
 
@@ -153,7 +168,7 @@ export function PokemonList() {
 
       {/* Loading indicator for background refresh */}
       {pokemonLoading && pokemonData && (
-        <div className="text-xs text-center text-muted-foreground">
+        <div className="text-muted-foreground text-center text-xs">
           🔄 Updating results...
         </div>
       )}
@@ -178,29 +193,41 @@ export function PokemonList() {
               Previous
             </Button>
             <span className="text-muted-foreground px-2 text-sm">
-              Page {localFilters.page} of {filteredAndPaginatedPokemon.pagination.totalPages}
+              Page {localFilters.page} of{" "}
+              {filteredAndPaginatedPokemon.pagination.totalPages}
             </span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => handleFilterChange("page", localFilters.page! + 1)}
-              disabled={localFilters.page! >= filteredAndPaginatedPokemon.pagination.totalPages}
+              disabled={
+                localFilters.page! >=
+                filteredAndPaginatedPokemon.pagination.totalPages
+              }
             >
               Next
             </Button>
           </div>
 
           <div className="text-muted-foreground text-sm">
-            {filteredAndPaginatedPokemon.pagination.totalCount} Pokemon {localFilters.search || localFilters.typeId ? "filtered" : "total"}
+            {filteredAndPaginatedPokemon.pagination.totalCount} Pokemon{" "}
+            {localFilters.search || localFilters.typeId ? "filtered" : "total"}
           </div>
         </div>
       )}
 
       {/* Empty State */}
       {filteredAndPaginatedPokemon.data.length === 0 && (
-        <PokemonEmptyState 
+        <PokemonEmptyState
           onClearFilters={clearFilters}
-          hasFilters={!!(localFilters.search || localFilters.typeId || localFilters.minPower || localFilters.maxPower)}
+          hasFilters={
+            !!(
+              localFilters.search ||
+              localFilters.typeId ||
+              localFilters.minPower ||
+              localFilters.maxPower
+            )
+          }
         />
       )}
     </div>
@@ -255,10 +282,10 @@ function PokemonListSkeleton() {
 }
 
 // Enhanced empty state component
-function PokemonEmptyState({ 
-  onClearFilters, 
-  hasFilters 
-}: { 
+function PokemonEmptyState({
+  onClearFilters,
+  hasFilters,
+}: {
   onClearFilters: () => void
   hasFilters: boolean
 }) {
@@ -271,10 +298,9 @@ function PokemonEmptyState({
             {hasFilters ? "No Pokemon Found" : "No Pokemon Available"}
           </h3>
           <p className="text-muted-foreground text-sm">
-            {hasFilters 
+            {hasFilters
               ? "No Pokemon found matching your search criteria. Try adjusting your filters."
-              : "No Pokemon have been added to the system yet."
-            }
+              : "No Pokemon have been added to the system yet."}
           </p>
         </div>
         {hasFilters && (

@@ -29,6 +29,9 @@ export function useDebouncedValue<T>(value: T, delay: number): T {
  * @param delay - The delay in milliseconds (default 300ms)
  * @returns The debounced search term
  */
-export function useDebouncedSearch(searchTerm: string, delay: number = 300): string {
+export function useDebouncedSearch(
+  searchTerm: string,
+  delay: number = 300
+): string {
   return useDebouncedValue(searchTerm, delay)
-} 
+}

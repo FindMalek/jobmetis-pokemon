@@ -72,8 +72,13 @@ export const startBattle = publicProcedure
         throw new Error("One or both teams not found")
       }
 
-      if (team1Prisma.members.length !== 6 || team2Prisma.members.length !== 6) {
-        throw new Error(`Both teams must have exactly 6 Pokemon. Team 1: ${team1Prisma.members.length}, Team 2: ${team2Prisma.members.length}`)
+      if (
+        team1Prisma.members.length !== 6 ||
+        team2Prisma.members.length !== 6
+      ) {
+        throw new Error(
+          `Both teams must have exactly 6 Pokemon. Team 1: ${team1Prisma.members.length}, Team 2: ${team2Prisma.members.length}`
+        )
       }
 
       console.log("🔄 Converting teams to RO format...")
@@ -95,7 +100,7 @@ export const startBattle = publicProcedure
       })
 
       console.log("🔄 Converting battle state to API format...")
-      
+
       try {
         // Convert battle teams to API format
         console.log("📝 Converting team 1...")
@@ -159,22 +164,37 @@ export const startBattle = publicProcedure
         const validationResult = battleResultRoSchema.safeParse(battleResult)
         if (!validationResult.success) {
           console.error("💥 Schema validation failed:", validationResult.error)
-          console.error("Schema errors:", JSON.stringify(validationResult.error.errors, null, 2))
-          throw new Error(`Schema validation failed: ${validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`)
+          console.error(
+            "Schema errors:",
+            JSON.stringify(validationResult.error.errors, null, 2)
+          )
+          throw new Error(
+            `Schema validation failed: ${validationResult.error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ")}`
+          )
         }
         console.log("✅ Schema validation passed")
 
         console.log("🎉 Returning successful battle result")
         return battleResult
-
       } catch (conversionError) {
-        console.error("💥 Error during battle result conversion:", conversionError)
-        console.error("Battle state that failed:", JSON.stringify(battleState, null, 2))
-        throw new Error(`Failed to convert battle result: ${conversionError instanceof Error ? conversionError.message : "Unknown conversion error"}`)
+        console.error(
+          "💥 Error during battle result conversion:",
+          conversionError
+        )
+        console.error(
+          "Battle state that failed:",
+          JSON.stringify(battleState, null, 2)
+        )
+        throw new Error(
+          `Failed to convert battle result: ${conversionError instanceof Error ? conversionError.message : "Unknown conversion error"}`
+        )
       }
     } catch (error) {
       console.error("💥 Battle error:", error)
-      console.error("Error stack:", error instanceof Error ? error.stack : "Unknown error")
+      console.error(
+        "Error stack:",
+        error instanceof Error ? error.stack : "Unknown error"
+      )
       throw error
     }
   })
