@@ -19,9 +19,9 @@ export const pokemonQueryDtoSchema = z.object({
   typeId: z.string().optional(),
   minPower: z.number().min(10).max(100).optional(),
   maxPower: z.number().min(10).max(100).optional(),
-  orderBy: z.enum(["name", "power", "life"]).default("name"),
-  page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(100).default(20),
+  orderBy: z.enum(["name", "power", "life"]).optional().default("name"),
+  page: z.number().min(1).optional().default(1),
+  limit: z.number().min(1).max(100).optional().default(20),
 })
 
 export type CreatePokemonDto = z.infer<typeof createPokemonDtoSchema>

@@ -7,9 +7,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 export const battleKeys = {
   all: ["battles"] as const,
   lists: () => [...battleKeys.all, "list"] as const,
-  list: (filters: string) => [...battleKeys.lists(), { filters }] as const,
+  list: (filters: Record<string, any>) =>
+    [...battleKeys.lists(), filters] as const,
   details: () => [...battleKeys.all, "detail"] as const,
   detail: (id: string) => [...battleKeys.details(), id] as const,
+  typeChart: () => [...battleKeys.all, "typeChart"] as const,
 }
 
 // Get battle summary
@@ -18,24 +20,15 @@ export function useBattleSummary(battleId: string) {
     queryKey: battleKeys.detail(battleId),
     queryFn: () => orpc.battle.getBattleSummary.call({ battleId }),
     enabled: !!battleId,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
 // Start battle mutation
 export function useStartBattle() {
-  const queryClient = useQueryClient()
-
   return useMutation({
-    mutationFn: orpc.battle.startBattle.call,
-    onSuccess: () => {
-      // Invalidate battle lists to show new battle
-      queryClient.invalidateQueries({
-        queryKey: battleKeys.lists(),
-      })
-    },
-    onError: (error) => {
-      console.error("Failed to start battle:", error)
-    },
+    mutationFn: (data: { team1Id: string; team2Id: string }) =>
+      orpc.battle.startBattle.call(data),
   })
 }
 
@@ -64,8 +57,8 @@ export function useTypeEffectivenessChart(
 // Get full type effectiveness chart
 export function useFullTypeChart() {
   return useQuery({
-    queryKey: [...battleKeys.all, "fullTypeChart"],
+    queryKey: battleKeys.typeChart(),
     queryFn: () => orpc.battle.getFullTypeChart.call({}),
-    staleTime: 15 * 60 * 1000, // 15 minutes - effectiveness rarely changes
+    staleTime: 10 * 60 * 1000, // Type chart rarely changes
   })
 }

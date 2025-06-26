@@ -7,31 +7,28 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 export const teamKeys = {
   all: ["teams"] as const,
   lists: () => [...teamKeys.all, "list"] as const,
-  list: (filters: string) => [...teamKeys.lists(), { filters }] as const,
+  list: (filters: Record<string, any>) =>
+    [...teamKeys.lists(), filters] as const,
   details: () => [...teamKeys.all, "detail"] as const,
   detail: (id: string) => [...teamKeys.details(), id] as const,
 }
 
 // Get all teams
-export function useTeams(filters?: {
-  sortBy?: "name" | "totalPower" | "createdAt"
-  order?: "asc" | "desc"
-  page?: number
-  limit?: number
-}) {
+export function useTeams() {
   return useQuery({
-    queryKey: teamKeys.list(JSON.stringify(filters || {})),
-    queryFn: () => orpc.team.getAllTeams.call(filters || {}),
+    queryKey: teamKeys.lists(),
+    queryFn: () => orpc.team.getAllTeams.call({}),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }
 
 // Get single team
-export function useTeamById(id: string) {
+export function useTeam(id: string) {
   return useQuery({
     queryKey: teamKeys.detail(id),
     queryFn: () => orpc.team.getTeamById.call({ id }),
     enabled: !!id,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -40,15 +37,10 @@ export function useCreateTeam() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: orpc.team.createTeam.call,
+    mutationFn: (data: { name: string; pokemonIds: string[] }) =>
+      orpc.team.createTeam.call(data),
     onSuccess: () => {
-      // Invalidate and refetch team lists
-      queryClient.invalidateQueries({
-        queryKey: teamKeys.lists(),
-      })
-    },
-    onError: (error) => {
-      console.error("Failed to create team:", error)
+      queryClient.invalidateQueries({ queryKey: teamKeys.all })
     },
   })
 }
@@ -58,17 +50,11 @@ export function useUpdateTeam() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: orpc.team.updateTeam.call,
-    onSuccess: (data) => {
-      // Invalidate and refetch team lists
-      queryClient.invalidateQueries({
-        queryKey: teamKeys.lists(),
-      })
-      // Update specific team cache
-      queryClient.setQueryData(teamKeys.detail(data.id), data)
-    },
-    onError: (error) => {
-      console.error("Failed to update team:", error)
+    mutationFn: (data: { id: string; name?: string; pokemonIds?: string[] }) =>
+      orpc.team.updateTeam.call(data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: teamKeys.all })
+      queryClient.invalidateQueries({ queryKey: teamKeys.detail(variables.id) })
     },
   })
 }
@@ -78,15 +64,17 @@ export function useDeleteTeam() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: orpc.team.deleteTeam.call,
+    mutationFn: (id: string) => orpc.team.deleteTeam.call({ id }),
     onSuccess: () => {
-      // Invalidate and refetch team lists
-      queryClient.invalidateQueries({
-        queryKey: teamKeys.lists(),
-      })
+      queryClient.invalidateQueries({ queryKey: teamKeys.all })
     },
-    onError: (error) => {
-      console.error("Failed to delete team:", error)
-    },
+  })
+}
+
+export function useUserTeams(userId?: string) {
+  return useQuery({
+    queryKey: [...teamKeys.lists(), "user", userId],
+    queryFn: () => orpc.team.getUserTeams.call({ userId }),
+    staleTime: 5 * 60 * 1000,
   })
 }

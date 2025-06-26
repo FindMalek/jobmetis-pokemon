@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { usePokemon, usePokemonTypes } from "@/orpc/hooks"
+import type { PokemonQueryDto } from "@/schemas/pokemon"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -18,24 +19,27 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 
 export function PokemonList() {
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<PokemonQueryDto>({
     search: "",
     typeId: "",
-    minPower: undefined as number | undefined,
-    maxPower: undefined as number | undefined,
-    orderBy: "name" as "name" | "power" | "life",
+    minPower: undefined,
+    maxPower: undefined,
+    orderBy: "name",
     page: 1,
     limit: 12,
   })
 
   const { data: pokemonData, isLoading: pokemonLoading } = usePokemon(filters)
-  const { data: types, isLoading: typesLoading } = usePokemonTypes()
+  const { data: types } = usePokemonTypes()
 
-  const handleFilterChange = (key: string, value: string | number) => {
+  const handleFilterChange = (
+    key: keyof PokemonQueryDto,
+    value: string | number | undefined
+  ) => {
     setFilters((prev) => ({
       ...prev,
       [key]: value,
-      page: 1, // Reset to first page when filters change
+      page: key === "page" ? (value as number) : 1,
     }))
   }
 
@@ -51,20 +55,43 @@ export function PokemonList() {
     })
   }
 
-  if (pokemonLoading || typesLoading) {
+  if (pokemonLoading && !pokemonData) {
     return (
       <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+        {/* Filters Skeleton */}
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-32" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Pokemon Grid Skeleton */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[...Array(8)].map((_, i) => (
             <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-4 w-3/4" />
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="h-5 w-16" />
+                </div>
               </CardHeader>
               <CardContent>
-                <Skeleton className="h-32 w-full rounded-md" />
-                <div className="mt-4 space-y-2">
-                  <Skeleton className="h-4 w-1/2" />
-                  <Skeleton className="h-4 w-1/3" />
+                <div className="space-y-3">
+                  <Skeleton className="aspect-square w-full rounded-lg" />
+                  <div className="flex justify-between text-sm">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -79,40 +106,84 @@ export function PokemonList() {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Filters</CardTitle>
+          <CardTitle>Filter Pokemon</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
-              <Label htmlFor="search">Search Pokemon</Label>
+              <Label htmlFor="search">Search</Label>
               <Input
                 id="search"
-                placeholder="Enter Pokemon name..."
-                value={filters.search}
+                placeholder="Search Pokemon..."
+                value={filters.search || ""}
                 onChange={(e) => handleFilterChange("search", e.target.value)}
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="type">Type</Label>
               <Select
-                value={filters.typeId}
+                value={filters.typeId || ""}
                 onValueChange={(value) => handleFilterChange("typeId", value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="All types" />
+                  <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All types</SelectItem>
+                  <SelectItem value="">All Types</SelectItem>
                   {types?.map((type) => (
                     <SelectItem key={type.id} value={type.id}>
-                      {type.displayName}
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-3 w-3 rounded-full"
+                          style={{ backgroundColor: type.color }}
+                        />
+                        {type.displayName}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
-              <Label htmlFor="orderBy">Sort by</Label>
+              <Label htmlFor="minPower">Min Power</Label>
+              <Input
+                id="minPower"
+                type="number"
+                placeholder="10"
+                value={filters.minPower || ""}
+                onChange={(e) =>
+                  handleFilterChange(
+                    "minPower",
+                    e.target.value ? parseInt(e.target.value) : undefined
+                  )
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="maxPower">Max Power</Label>
+              <Input
+                id="maxPower"
+                type="number"
+                placeholder="100"
+                value={filters.maxPower || ""}
+                onChange={(e) =>
+                  handleFilterChange(
+                    "maxPower",
+                    e.target.value ? parseInt(e.target.value) : undefined
+                  )
+                }
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="sortBy" className="text-sm">
+                Sort by:
+              </Label>
               <Select
                 value={filters.orderBy}
                 onValueChange={(value) =>
@@ -122,7 +193,7 @@ export function PokemonList() {
                   )
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="w-32">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -132,25 +203,29 @@ export function PokemonList() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-end">
-              <Button onClick={clearFilters} variant="outline">
-                Clear Filters
-              </Button>
-            </div>
+
+            <Button variant="outline" onClick={clearFilters} size="sm">
+              Clear Filters
+            </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Pokemon Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {pokemonData?.data.map((pokemon) => (
-          <Card key={pokemon.id} className="transition-shadow hover:shadow-lg">
+          <Card
+            key={pokemon.id}
+            className="group overflow-hidden transition-all hover:scale-[1.02] hover:shadow-lg"
+          >
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">{pokemon.name}</CardTitle>
+                <CardTitle className="truncate pr-2 text-lg">
+                  {pokemon.name}
+                </CardTitle>
                 <Badge
                   style={{ backgroundColor: pokemon.type.color }}
-                  className="text-white"
+                  className="shrink-0 text-xs text-white"
                 >
                   {pokemon.type.displayName}
                 </Badge>
@@ -158,32 +233,28 @@ export function PokemonList() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex aspect-square items-center justify-center rounded-lg bg-gray-100">
+                <div className="relative overflow-hidden rounded-lg bg-gray-100">
                   <img
                     src={pokemon.image}
                     alt={pokemon.name}
-                    className="h-full w-full rounded-lg object-cover"
+                    className="aspect-square w-full object-cover transition-transform group-hover:scale-105"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement
                       target.src = `https://api.dicebear.com/7.x/shapes/svg?seed=${pokemon.name}`
                     }}
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <span className="font-medium">Power:</span> {pokemon.power}
+
+                <div className="flex justify-between text-sm">
+                  <div className="flex items-center gap-1">
+                    <span className="text-yellow-500">⚡</span>
+                    <span className="font-medium">{pokemon.power}</span>
                   </div>
-                  <div>
-                    <span className="font-medium">Life:</span> {pokemon.life}
+                  <div className="flex items-center gap-1">
+                    <span className="text-red-500">❤️</span>
+                    <span className="font-medium">{pokemon.life}</span>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="flex-1">
-                    View Details
-                  </Button>
-                  <Button size="sm" className="flex-1">
-                    Add to Team
-                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -193,37 +264,51 @@ export function PokemonList() {
 
       {/* Pagination */}
       {pokemonData && pokemonData.pagination.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
-          <Button
-            variant="outline"
-            disabled={filters.page <= 1}
-            onClick={() => handleFilterChange("page", filters.page - 1)}
-          >
-            Previous
-          </Button>
-          <span className="text-muted-foreground text-sm">
-            Page {filters.page} of {pokemonData.pagination.totalPages}
-          </span>
-          <Button
-            variant="outline"
-            disabled={filters.page >= pokemonData.pagination.totalPages}
-            onClick={() => handleFilterChange("page", filters.page + 1)}
-          >
-            Next
-          </Button>
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleFilterChange("page", filters.page! - 1)}
+              disabled={filters.page! <= 1}
+            >
+              Previous
+            </Button>
+            <span className="text-muted-foreground px-2 text-sm">
+              Page {filters.page} of {pokemonData.pagination.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleFilterChange("page", filters.page! + 1)}
+              disabled={filters.page! >= pokemonData.pagination.totalPages}
+            >
+              Next
+            </Button>
+          </div>
+
+          <div className="text-muted-foreground text-sm">
+            {pokemonData.pagination.totalCount} Pokemon total
+          </div>
         </div>
       )}
 
       {/* Empty State */}
       {pokemonData?.data.length === 0 && (
-        <div className="py-12 text-center">
-          <p className="text-muted-foreground">
-            No Pokemon found matching your criteria.
-          </p>
-          <Button onClick={clearFilters} variant="outline" className="mt-4">
-            Clear Filters
-          </Button>
-        </div>
+        <Card className="p-8 text-center">
+          <div className="space-y-4">
+            <div className="text-4xl">🔍</div>
+            <div>
+              <h3 className="font-medium">No Pokemon Found</h3>
+              <p className="text-muted-foreground text-sm">
+                No Pokemon found matching your criteria.
+              </p>
+            </div>
+            <Button onClick={clearFilters} variant="outline" size="sm">
+              Clear Filters
+            </Button>
+          </div>
+        </Card>
       )}
     </div>
   )
