@@ -1,6 +1,8 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -13,6 +15,20 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export function AddItemDropdown() {
+  const router = useRouter()
+
+  const handleNewPokemon = () => {
+    // Navigate to Pokemon page where they can create new Pokemon
+    router.push("/dashboard/pokemon")
+    toast.success("Navigate to Pokemon page to create new Pokemon")
+  }
+
+  const handleNewTeam = () => {
+    // Navigate to Teams page where they can create new team
+    router.push("/dashboard/teams")
+    toast.success("Navigate to Teams page to create new team")
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -23,13 +39,13 @@ export function AddItemDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
         <DropdownMenuLabel>Pokemon</DropdownMenuLabel>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleNewPokemon}>
           <Plus className="mr-2 h-4 w-4" />
           New Pokemon
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuLabel>Teams</DropdownMenuLabel>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleNewTeam}>
           <Plus className="mr-2 h-4 w-4" />
           New Team
         </DropdownMenuItem>
