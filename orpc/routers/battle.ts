@@ -11,6 +11,8 @@ import {
 import { os } from "@orpc/server"
 import { z } from "zod"
 
+import { BattleEngineService } from "@/lib/services"
+
 import type { ORPCContext } from "../types"
 
 const baseProcedure = os.$context<ORPCContext>()
@@ -33,7 +35,7 @@ async function getTypeEffectiveness(
   return weakness?.factor ?? 1.0
 }
 
-// Start a battle between two teams
+// Start a battle between two teams with advanced simulation
 export const startBattle = publicProcedure
   .input(startBattleDtoSchema)
   .output(battleResultRoSchema)
@@ -68,67 +70,55 @@ export const startBattle = publicProcedure
     const team1Ro = TeamEntity.fromPrisma(team1Prisma)
     const team2Ro = TeamEntity.fromPrisma(team2Prisma)
 
-    // Convert to battle format using entity methods
-    const battleTeam1 = TeamEntity.toBattleTeam(team1Ro)
-    const battleTeam2 = TeamEntity.toBattleTeam(team2Ro)
-
-    // Simple battle simulation
-    const startTime = Date.now()
-    const pokemon1 = team1Ro.members[0]
-    const pokemon2 = team2Ro.members[0]
-
-    // Get type effectiveness
-    const effectiveness1to2 = await getTypeEffectiveness(
-      pokemon1.type.id,
-      pokemon2.type.id
-    )
-    const effectiveness2to1 = await getTypeEffectiveness(
-      pokemon2.type.id,
-      pokemon1.type.id
+    // Use advanced battle engine for complete simulation
+    const battleState = await BattleEngineService.simulateCompleteBattle(
+      team1Ro,
+      team2Ro,
+      getTypeEffectiveness
     )
 
-    // Calculate damage
-    const damage1to2 = Math.floor(pokemon1.power * effectiveness1to2)
-    const damage2to1 = Math.floor(pokemon2.power * effectiveness2to1)
+    // Convert battle teams to API format
+    const battleTeam1 = {
+      id: battleState.team1.id,
+      name: battleState.team1.name,
+      members: battleState.team1.pokemon.map((p) => ({
+        id: p.id,
+        name: p.name,
+        type: p.type,
+        image: p.image,
+        power: p.power,
+        life: p.maxLife,
+      })),
+      currentPokemonIndex: battleState.team1.currentPokemonIndex,
+      defeatedCount: battleState.team1.defeatedCount,
+      isDefeated: battleState.team1.isDefeated,
+    }
 
-    // Create battle result manually (simplified)
+    const battleTeam2 = {
+      id: battleState.team2.id,
+      name: battleState.team2.name,
+      members: battleState.team2.pokemon.map((p) => ({
+        id: p.id,
+        name: p.name,
+        type: p.type,
+        image: p.image,
+        power: p.power,
+        life: p.maxLife,
+      })),
+      currentPokemonIndex: battleState.team2.currentPokemonIndex,
+      defeatedCount: battleState.team2.defeatedCount,
+      isDefeated: battleState.team2.isDefeated,
+    }
+
+    // Create comprehensive battle result
     const battleResult: BattleResultRo = {
-      id: `battle_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: battleState.id,
       team1: battleTeam1,
       team2: battleTeam2,
-      rounds: [
-        {
-          roundNumber: 1,
-          pokemon1: {
-            id: pokemon1.id,
-            name: pokemon1.name,
-            type: pokemon1.type,
-            image: pokemon1.image,
-            power: pokemon1.power,
-            life: pokemon1.life,
-            isDefeated: false,
-            currentLife: pokemon1.life - damage2to1,
-          },
-          pokemon2: {
-            id: pokemon2.id,
-            name: pokemon2.name,
-            type: pokemon2.type,
-            image: pokemon2.image,
-            power: pokemon2.power,
-            life: pokemon2.life,
-            isDefeated: false,
-            currentLife: pokemon2.life - damage1to2,
-          },
-          damage1: damage1to2,
-          damage2: damage2to1,
-          typeEffectiveness1: effectiveness1to2,
-          typeEffectiveness2: effectiveness2to1,
-          winner: damage1to2 > damage2to1 ? "pokemon1" : "pokemon2",
-        },
-      ],
-      winner: damage1to2 > damage2to1 ? "team1" : "team2",
-      totalRounds: 1,
-      battleDuration: Date.now() - startTime,
+      rounds: battleState.rounds,
+      winner: battleState.winner || "team1",
+      totalRounds: battleState.rounds.length,
+      battleDuration: battleState.battleDuration,
       createdAt: new Date(),
     }
 
@@ -152,7 +142,7 @@ export const getBattleSummary = publicProcedure
     }
   })
 
-// Get type effectiveness chart
+// Get type effectiveness for battle planning
 export const getTypeEffectivenessChart = publicProcedure
   .input(z.object({ attackerTypeId: z.string(), defenderTypeId: z.string() }))
   .output(z.object({ factor: z.number() }))
@@ -163,7 +153,7 @@ export const getTypeEffectivenessChart = publicProcedure
     return { factor }
   })
 
-// Get full type effectiveness chart
+// Get full type effectiveness chart for strategy
 export const getFullTypeChart = publicProcedure
   .output(
     z.array(

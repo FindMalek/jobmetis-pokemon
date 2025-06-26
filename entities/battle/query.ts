@@ -32,10 +32,8 @@ export class BattleQuery {
     defenderTypeId: string
   ) {
     return {
-      type1Id_type2Id: {
-        type1Id: attackerTypeId,
-        type2Id: defenderTypeId,
-      },
-    } satisfies Prisma.WeaknessWhereUniqueInput
+      type1Id: attackerTypeId,
+      type2Id: defenderTypeId,
+    } satisfies Prisma.WeaknessWhereInput
   }
 }
