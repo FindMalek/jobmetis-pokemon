@@ -10,7 +10,7 @@ async function main() {
 
   // Seed users for authentication
   await seedUsers(prisma)
-  
+
   // Seed Pokemon data
   await seedPokemon()
 

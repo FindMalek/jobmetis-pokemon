@@ -2,7 +2,8 @@ import { SiteConfig } from "@/types"
 
 export const siteConfig: SiteConfig = {
   name: "Pokemon Battle Arena",
-  description: "Build teams of Pokemon and battle with type effectiveness mechanics.",
+  description:
+    "Build teams of Pokemon and battle with type effectiveness mechanics.",
   url: "https://jobmetis-pokemon.vercel.app",
   images: {
     default: "https://jobmetis-pokemon.vercel.app/og.png",
@@ -28,7 +29,7 @@ export const siteConfig: SiteConfig = {
     "Simulation",
     "Next.js",
     "React",
-    "TypeScript", 
+    "TypeScript",
     "Prisma",
     "TailwindCSS",
     "Supabase",

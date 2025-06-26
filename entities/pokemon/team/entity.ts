@@ -1,5 +1,11 @@
-import { Team as PrismaTeam, TeamMember as PrismaTeamMember, Pokemon as PrismaPokemon, PokemonType as PrismaPokemonType } from "@prisma/client"
-import { TeamRo, BattleTeamRo, TeamSummaryRo, TeamListItemRo } from "@/schemas"
+import { BattleTeamRo, TeamListItemRo, TeamRo, TeamSummaryRo } from "@/schemas"
+import {
+  Pokemon as PrismaPokemon,
+  PokemonType as PrismaPokemonType,
+  Team as PrismaTeam,
+  TeamMember as PrismaTeamMember,
+} from "@prisma/client"
+
 import { PokemonEntity } from "../pokemon"
 
 // Team member with full Pokemon data
@@ -19,7 +25,7 @@ export class TeamEntity {
   static fromPrisma(prismaTeam: TeamWithMembers): TeamRo {
     const sortedMembers = prismaTeam.members
       .sort((a, b) => a.position - b.position)
-      .map(member => PokemonEntity.fromPrisma(member.pokemon))
+      .map((member) => PokemonEntity.fromPrisma(member.pokemon))
 
     return {
       id: prismaTeam.id,
@@ -47,7 +53,7 @@ export class TeamEntity {
   static fromPrismaToListItem(prismaTeam: TeamWithMembers): TeamListItemRo {
     const memberPreviews = prismaTeam.members
       .slice(0, 3) // Take first 3 Pokemon
-      .map(member => ({
+      .map((member) => ({
         name: member.pokemon.name,
         image: member.pokemon.image,
         typeName: member.pokemon.type.name.toLowerCase(),
@@ -85,7 +91,9 @@ export class TeamEntity {
   }
 
   // Get next active Pokemon for battle
-  static getNextActivePokemon(battleTeam: BattleTeamRo): TeamRo["members"][0] | null {
+  static getNextActivePokemon(
+    battleTeam: BattleTeamRo
+  ): TeamRo["members"][0] | null {
     if (battleTeam.currentPokemonIndex >= battleTeam.members.length) {
       return null
     }
@@ -96,7 +104,7 @@ export class TeamEntity {
   static switchToNextPokemon(battleTeam: BattleTeamRo): BattleTeamRo {
     const newIndex = battleTeam.currentPokemonIndex + 1
     const defeatedCount = battleTeam.defeatedCount + 1
-    
+
     return {
       ...battleTeam,
       currentPokemonIndex: newIndex,
@@ -104,4 +112,4 @@ export class TeamEntity {
       isDefeated: newIndex >= battleTeam.members.length,
     }
   }
-} 
+}

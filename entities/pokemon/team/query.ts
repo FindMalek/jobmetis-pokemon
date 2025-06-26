@@ -30,17 +30,12 @@ export class TeamQuery {
 
   // Order by total power (descending)
   static getOrderByPower(): Prisma.TeamOrderByWithRelationInput[] {
-    return [
-      { totalPower: "desc" },
-      { name: "asc" },
-    ]
+    return [{ totalPower: "desc" }, { name: "asc" }]
   }
 
   // Order by creation date (newest first)
   static getOrderByDate(): Prisma.TeamOrderByWithRelationInput[] {
-    return [
-      { createdAt: "desc" },
-    ]
+    return [{ createdAt: "desc" }]
   }
 
   // Where clause for searching by name
@@ -52,4 +47,4 @@ export class TeamQuery {
       },
     }
   }
-} 
+}

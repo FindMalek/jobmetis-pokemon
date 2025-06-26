@@ -1,5 +1,8 @@
-import { PokemonType as PrismaPokemonType, PokemonTypeEnum } from "@prisma/client"
 import { PokemonTypeRo, PokemonTypeWithStatsRo } from "@/schemas"
+import {
+  PokemonTypeEnum,
+  PokemonType as PrismaPokemonType,
+} from "@prisma/client"
 
 // Return Object for Pokemon Type
 export interface PokemonTypeRo {
@@ -27,13 +30,17 @@ export class PokemonTypeEntity {
       pokemon: Array<{ power: number; life: number }>
     }
   ): PokemonTypeWithStatsRo {
-    const avgPower = prismaType.pokemon.length > 0 
-      ? prismaType.pokemon.reduce((sum, p) => sum + p.power, 0) / prismaType.pokemon.length 
-      : 0
-    
-    const avgLife = prismaType.pokemon.length > 0
-      ? prismaType.pokemon.reduce((sum, p) => sum + p.life, 0) / prismaType.pokemon.length
-      : 0
+    const avgPower =
+      prismaType.pokemon.length > 0
+        ? prismaType.pokemon.reduce((sum, p) => sum + p.power, 0) /
+          prismaType.pokemon.length
+        : 0
+
+    const avgLife =
+      prismaType.pokemon.length > 0
+        ? prismaType.pokemon.reduce((sum, p) => sum + p.life, 0) /
+          prismaType.pokemon.length
+        : 0
 
     return {
       ...this.fromPrisma(prismaType),
@@ -81,4 +88,4 @@ export class PokemonTypeEntity {
         return "#757575" // Gray
     }
   }
-} 
+}

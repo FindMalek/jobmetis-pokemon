@@ -1,4 +1,4 @@
-    import { PrismaClient, PokemonTypeEnum } from "@prisma/client"
+import { PokemonTypeEnum, PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
@@ -19,9 +19,9 @@ export async function seedPokemon() {
 
   // Get the created types for referencing
   const types = await prisma.pokemonType.findMany()
-  const fireType = types.find(t => t.name === PokemonTypeEnum.FIRE)!
-  const waterType = types.find(t => t.name === PokemonTypeEnum.WATER)!
-  const grassType = types.find(t => t.name === PokemonTypeEnum.GRASS)!
+  const fireType = types.find((t) => t.name === PokemonTypeEnum.FIRE)!
+  const waterType = types.find((t) => t.name === PokemonTypeEnum.WATER)!
+  const grassType = types.find((t) => t.name === PokemonTypeEnum.GRASS)!
 
   // Create Weakness Chart using createMany
   await prisma.weakness.createMany({
@@ -44,25 +44,130 @@ export async function seedPokemon() {
   // Create all Pokemon using createMany for maximum speed
   const allPokemon = [
     // Fire Pokemon
-    { name: "Charmander", typeId: fireType.id, power: 39, life: 39, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" },
-    { name: "Charmeleon", typeId: fireType.id, power: 58, life: 58, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png" },
-    { name: "Charizard", typeId: fireType.id, power: 84, life: 78, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png" },
-    { name: "Growlithe", typeId: fireType.id, power: 70, life: 55, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png" },
-    { name: "Arcanine", typeId: fireType.id, power: 90, life: 90, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png" },
-    
+    {
+      name: "Charmander",
+      typeId: fireType.id,
+      power: 39,
+      life: 39,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+    },
+    {
+      name: "Charmeleon",
+      typeId: fireType.id,
+      power: 58,
+      life: 58,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png",
+    },
+    {
+      name: "Charizard",
+      typeId: fireType.id,
+      power: 84,
+      life: 78,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+    },
+    {
+      name: "Growlithe",
+      typeId: fireType.id,
+      power: 70,
+      life: 55,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/58.png",
+    },
+    {
+      name: "Arcanine",
+      typeId: fireType.id,
+      power: 90,
+      life: 90,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png",
+    },
+
     // Water Pokemon
-    { name: "Squirtle", typeId: waterType.id, power: 44, life: 44, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" },
-    { name: "Wartortle", typeId: waterType.id, power: 63, life: 59, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png" },
-    { name: "Blastoise", typeId: waterType.id, power: 83, life: 79, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png" },
-    { name: "Psyduck", typeId: waterType.id, power: 52, life: 50, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/54.png" },
-    { name: "Golduck", typeId: waterType.id, power: 82, life: 80, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/55.png" },
-    
+    {
+      name: "Squirtle",
+      typeId: waterType.id,
+      power: 44,
+      life: 44,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+    },
+    {
+      name: "Wartortle",
+      typeId: waterType.id,
+      power: 63,
+      life: 59,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png",
+    },
+    {
+      name: "Blastoise",
+      typeId: waterType.id,
+      power: 83,
+      life: 79,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png",
+    },
+    {
+      name: "Psyduck",
+      typeId: waterType.id,
+      power: 52,
+      life: 50,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/54.png",
+    },
+    {
+      name: "Golduck",
+      typeId: waterType.id,
+      power: 82,
+      life: 80,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/55.png",
+    },
+
     // Grass Pokemon
-    { name: "Bulbasaur", typeId: grassType.id, power: 49, life: 45, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" },
-    { name: "Ivysaur", typeId: grassType.id, power: 62, life: 60, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png" },
-    { name: "Venusaur", typeId: grassType.id, power: 82, life: 80, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png" },
-    { name: "Oddish", typeId: grassType.id, power: 50, life: 45, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/43.png" },
-    { name: "Vileplume", typeId: grassType.id, power: 80, life: 75, image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/45.png" },
+    {
+      name: "Bulbasaur",
+      typeId: grassType.id,
+      power: 49,
+      life: 45,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+    },
+    {
+      name: "Ivysaur",
+      typeId: grassType.id,
+      power: 62,
+      life: 60,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
+    },
+    {
+      name: "Venusaur",
+      typeId: grassType.id,
+      power: 82,
+      life: 80,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png",
+    },
+    {
+      name: "Oddish",
+      typeId: grassType.id,
+      power: 50,
+      life: 45,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/43.png",
+    },
+    {
+      name: "Vileplume",
+      typeId: grassType.id,
+      power: 80,
+      life: 75,
+      image:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/45.png",
+    },
   ]
 
   await prisma.pokemon.createMany({
@@ -91,15 +196,22 @@ export async function seedPokemon() {
   const createdTeams = await prisma.team.findMany()
 
   const pokemonByName = Object.fromEntries(
-    createdPokemon.map(p => [p.name, p])
+    createdPokemon.map((p) => [p.name, p])
   )
 
   // Create team members
   const teamMemberData = []
-  
+
   // Fire Squad
-  const fireSquad = createdTeams.find(t => t.name === "Fire Squad")!
-  const fireTeamMembers = ["Charmander", "Charmeleon", "Charizard", "Growlithe", "Arcanine", "Charmander"]
+  const fireSquad = createdTeams.find((t) => t.name === "Fire Squad")!
+  const fireTeamMembers = [
+    "Charmander",
+    "Charmeleon",
+    "Charizard",
+    "Growlithe",
+    "Arcanine",
+    "Charmander",
+  ]
   for (let i = 0; i < fireTeamMembers.length; i++) {
     teamMemberData.push({
       teamId: fireSquad.id,
@@ -109,8 +221,15 @@ export async function seedPokemon() {
   }
 
   // Water Warriors
-  const waterWarriors = createdTeams.find(t => t.name === "Water Warriors")!
-  const waterTeamMembers = ["Squirtle", "Wartortle", "Blastoise", "Psyduck", "Golduck", "Squirtle"]
+  const waterWarriors = createdTeams.find((t) => t.name === "Water Warriors")!
+  const waterTeamMembers = [
+    "Squirtle",
+    "Wartortle",
+    "Blastoise",
+    "Psyduck",
+    "Golduck",
+    "Squirtle",
+  ]
   for (let i = 0; i < waterTeamMembers.length; i++) {
     teamMemberData.push({
       teamId: waterWarriors.id,
@@ -120,8 +239,15 @@ export async function seedPokemon() {
   }
 
   // Grass Guardians
-  const grassGuardians = createdTeams.find(t => t.name === "Grass Guardians")!
-  const grassTeamMembers = ["Bulbasaur", "Ivysaur", "Venusaur", "Oddish", "Vileplume", "Bulbasaur"]
+  const grassGuardians = createdTeams.find((t) => t.name === "Grass Guardians")!
+  const grassTeamMembers = [
+    "Bulbasaur",
+    "Ivysaur",
+    "Venusaur",
+    "Oddish",
+    "Vileplume",
+    "Bulbasaur",
+  ]
   for (let i = 0; i < grassTeamMembers.length; i++) {
     teamMemberData.push({
       teamId: grassGuardians.id,
@@ -142,7 +268,10 @@ export async function seedPokemon() {
         where: { teamId: team.id },
         include: { pokemon: true },
       })
-      const totalPower = members.reduce((sum, member) => sum + member.pokemon.power, 0)
+      const totalPower = members.reduce(
+        (sum, member) => sum + member.pokemon.power,
+        0
+      )
       return prisma.team.update({
         where: { id: team.id },
         data: { totalPower },
@@ -152,4 +281,4 @@ export async function seedPokemon() {
 
   console.log("✅ Updated team total power")
   console.log("🎉 Pokemon seeding completed successfully!")
-} 
+}

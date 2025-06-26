@@ -1,4 +1,5 @@
 import { z } from "zod"
+
 import { PokemonTypeRoSchema } from "./pokemon-type"
 
 // Pokemon Return Object Schema
@@ -38,4 +39,4 @@ export const PokemonListItemRoSchema = z.object({
 export type PokemonRo = z.infer<typeof PokemonRoSchema>
 export type BattlePokemonRo = z.infer<typeof BattlePokemonRoSchema>
 export type PokemonWithStatsRo = z.infer<typeof PokemonWithStatsRoSchema>
-export type PokemonListItemRo = z.infer<typeof PokemonListItemRoSchema> 
+export type PokemonListItemRo = z.infer<typeof PokemonListItemRoSchema>

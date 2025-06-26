@@ -1,4 +1,4 @@
-import { Prisma, PokemonTypeEnum } from "@prisma/client"
+import { PokemonTypeEnum, Prisma } from "@prisma/client"
 
 export class PokemonQuery {
   // Include type information
@@ -25,7 +25,8 @@ export class PokemonQuery {
   // Where clause for filtering by type name (string) - converts to enum first
   static getByTypeNameWhere(typeName: string): Prisma.PokemonWhereInput {
     try {
-      const typeEnum = PokemonTypeEnum[typeName.toUpperCase() as keyof typeof PokemonTypeEnum]
+      const typeEnum =
+        PokemonTypeEnum[typeName.toUpperCase() as keyof typeof PokemonTypeEnum]
       return {
         type: {
           name: typeEnum,
@@ -38,7 +39,10 @@ export class PokemonQuery {
   }
 
   // Where clause for filtering by power range
-  static getByPowerRangeWhere(minPower: number, maxPower: number): Prisma.PokemonWhereInput {
+  static getByPowerRangeWhere(
+    minPower: number,
+    maxPower: number
+  ): Prisma.PokemonWhereInput {
     return {
       power: {
         gte: minPower,
@@ -48,7 +52,10 @@ export class PokemonQuery {
   }
 
   // Where clause for filtering by life range
-  static getByLifeRangeWhere(minLife: number, maxLife: number): Prisma.PokemonWhereInput {
+  static getByLifeRangeWhere(
+    minLife: number,
+    maxLife: number
+  ): Prisma.PokemonWhereInput {
     return {
       life: {
         gte: minLife,
@@ -87,7 +94,9 @@ export class PokemonQuery {
     }
 
     if (params.minPower !== undefined && params.maxPower !== undefined) {
-      conditions.push(this.getByPowerRangeWhere(params.minPower, params.maxPower))
+      conditions.push(
+        this.getByPowerRangeWhere(params.minPower, params.maxPower)
+      )
     }
 
     if (params.minLife !== undefined && params.maxLife !== undefined) {
@@ -98,7 +107,9 @@ export class PokemonQuery {
   }
 
   // Order by options
-  static getOrderBy(orderBy: "name" | "power" | "life" = "name"): Prisma.PokemonOrderByWithRelationInput[] {
+  static getOrderBy(
+    orderBy: "name" | "power" | "life" = "name"
+  ): Prisma.PokemonOrderByWithRelationInput[] {
     switch (orderBy) {
       case "power":
         return [{ power: "desc" }, { name: "asc" }]
@@ -117,4 +128,4 @@ export class PokemonQuery {
       },
     }
   }
-} 
+}

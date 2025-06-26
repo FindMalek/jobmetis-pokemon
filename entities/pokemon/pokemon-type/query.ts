@@ -22,8 +22,6 @@ export class PokemonTypeQuery {
 
   // Order by for consistent sorting
   static getOrderBy(): Prisma.PokemonTypeOrderByWithRelationInput[] {
-    return [
-      { name: "asc" },
-    ]
+    return [{ name: "asc" }]
   }
-} 
+}

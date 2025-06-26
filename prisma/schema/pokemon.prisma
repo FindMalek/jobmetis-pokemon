@@ -7,45 +7,45 @@ enum PokemonTypeEnum {
 
 // Pokemon Type Table
 model PokemonType {
-  id       String @id @default(cuid())
-  name     PokemonTypeEnum @unique
-  
+  id   String          @id @default(cuid())
+  name PokemonTypeEnum @unique
+
   // Relations
-  pokemon         Pokemon[]
-  weaknessesFrom  Weakness[] @relation("AttackingType")
-  weaknessesTo    Weakness[] @relation("DefendingType")
-  
+  pokemon        Pokemon[]
+  weaknessesFrom Weakness[] @relation("AttackingType")
+  weaknessesTo   Weakness[] @relation("DefendingType")
+
   @@map("pokemon_type")
 }
 
 // Pokemon Table  
 model Pokemon {
-  id    String @id @default(cuid())
-  name  String @unique
+  id     String @id @default(cuid())
+  name   String @unique
   typeId String
-  image String
-  power Int    @default(50) // 10-100
-  life  Int    @default(50) // 10-100
-  
+  image  String
+  power  Int    @default(50) // 10-100
+  life   Int    @default(50) // 10-100
+
   // Relations
-  type   PokemonType @relation(fields: [typeId], references: [id])
+  type            PokemonType  @relation(fields: [typeId], references: [id])
   teamMemberships TeamMember[]
-  
+
   // Constraints
   @@map("pokemon")
 }
 
 // Weakness/Type Effectiveness Chart
 model Weakness {
-  id     String @id @default(cuid())  
+  id      String @id @default(cuid())
   type1Id String // Attacking type
   type2Id String // Defending type
-  factor Float  // Effectiveness multiplier
-  
+  factor  Float // Effectiveness multiplier
+
   // Relations
   attackingType PokemonType @relation("AttackingType", fields: [type1Id], references: [id])
   defendingType PokemonType @relation("DefendingType", fields: [type2Id], references: [id])
-  
+
   // Unique constraint to prevent duplicate weakness entries
   @@unique([type1Id, type2Id])
   @@map("weakness")
@@ -53,30 +53,30 @@ model Weakness {
 
 // Teams Table
 model Team {
-  id         String @id @default(cuid())
-  name       String @unique
-  totalPower Int    @default(0) // Calculated field
+  id         String   @id @default(cuid())
+  name       String   @unique
+  totalPower Int      @default(0) // Calculated field
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  
+
   // Relations
   members TeamMember[]
-  
+
   @@map("team")
 }
 
 // Team Members Junction Table (allows 6 Pokemon per team, Pokemon can be repeated)
 model TeamMember {
-  id       String @id @default(cuid())
-  teamId   String
+  id        String @id @default(cuid())
+  teamId    String
   pokemonId String
-  position Int    // 1-6, position in team
-  
+  position  Int // 1-6, position in team
+
   // Relations
   team    Team    @relation(fields: [teamId], references: [id], onDelete: Cascade)
   pokemon Pokemon @relation(fields: [pokemonId], references: [id])
-  
+
   // Constraints - each team position should be unique
   @@unique([teamId, position])
   @@map("team_member")
-} 
+}

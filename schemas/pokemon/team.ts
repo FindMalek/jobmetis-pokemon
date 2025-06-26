@@ -1,4 +1,5 @@
 import { z } from "zod"
+
 import { PokemonRoSchema } from "./pokemon"
 
 // Team Return Object Schema
@@ -36,15 +37,19 @@ export const TeamListItemRoSchema = z.object({
   id: z.string(),
   name: z.string(),
   totalPower: z.number(),
-  memberPreviews: z.array(z.object({
-    name: z.string(),
-    image: z.string(),
-    typeName: z.string(),
-  })).max(3), // Show first 3 Pokemon as preview
+  memberPreviews: z
+    .array(
+      z.object({
+        name: z.string(),
+        image: z.string(),
+        typeName: z.string(),
+      })
+    )
+    .max(3), // Show first 3 Pokemon as preview
   createdAt: z.date(),
 })
 
 export type TeamRo = z.infer<typeof TeamRoSchema>
 export type BattleTeamRo = z.infer<typeof BattleTeamRoSchema>
 export type TeamSummaryRo = z.infer<typeof TeamSummaryRoSchema>
-export type TeamListItemRo = z.infer<typeof TeamListItemRoSchema> 
+export type TeamListItemRo = z.infer<typeof TeamListItemRoSchema>

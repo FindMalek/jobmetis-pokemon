@@ -1,8 +1,9 @@
+import { PokemonTypeEntity, PokemonTypeQuery } from "@/entities"
 import { database } from "@/prisma/client"
-import { PokemonTypeQuery, PokemonTypeEntity } from "@/entities"
 import { PokemonTypeRoSchema } from "@/schemas"
 import { os } from "@orpc/server"
 import { z } from "zod"
+
 import type { ORPCContext } from "../types"
 
 const baseProcedure = os.$context<ORPCContext>()
@@ -20,7 +21,7 @@ export const getAllTypes = publicProcedure
       orderBy: PokemonTypeQuery.getOrderBy(),
     })
 
-    return types.map(type => PokemonTypeEntity.fromPrisma(type))
+    return types.map((type) => PokemonTypeEntity.fromPrisma(type))
   })
 
 // Get type by ID
@@ -39,11 +40,15 @@ export const getTypeById = publicProcedure
 // Get type effectiveness chart
 export const getEffectivenessChart = publicProcedure
   .input(z.object({}))
-  .output(z.array(z.object({
-    attackingType: PokemonTypeRoSchema,
-    defendingType: PokemonTypeRoSchema,
-    factor: z.number(),
-  })))
+  .output(
+    z.array(
+      z.object({
+        attackingType: PokemonTypeRoSchema,
+        defendingType: PokemonTypeRoSchema,
+        factor: z.number(),
+      })
+    )
+  )
   .handler(async () => {
     const weaknesses = await database.weakness.findMany({
       include: {
@@ -52,7 +57,7 @@ export const getEffectivenessChart = publicProcedure
       },
     })
 
-    return weaknesses.map(weakness => ({
+    return weaknesses.map((weakness) => ({
       attackingType: PokemonTypeEntity.fromPrisma(weakness.attackingType),
       defendingType: PokemonTypeEntity.fromPrisma(weakness.defendingType),
       factor: weakness.factor,
@@ -63,4 +68,4 @@ export const pokemonTypeRouter = {
   getAllTypes,
   getTypeById,
   getEffectivenessChart,
-} 
+}

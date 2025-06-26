@@ -1,4 +1,5 @@
 import { z } from "zod"
+
 import { BattlePokemonRoSchema } from "./pokemon"
 import { BattleTeamRoSchema } from "./team"
 
@@ -39,4 +40,4 @@ export const BattleSummarySchema = z.object({
 
 export type BattleRound = z.infer<typeof BattleRoundSchema>
 export type BattleResult = z.infer<typeof BattleResultSchema>
-export type BattleSummary = z.infer<typeof BattleSummarySchema> 
+export type BattleSummary = z.infer<typeof BattleSummarySchema>

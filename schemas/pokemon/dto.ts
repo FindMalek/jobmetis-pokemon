@@ -55,4 +55,4 @@ export type CreateTeamDto = z.infer<typeof CreateTeamDtoSchema>
 export type UpdateTeamDto = z.infer<typeof UpdateTeamDtoSchema>
 export type StartBattleDto = z.infer<typeof StartBattleDtoSchema>
 export type PokemonQueryDto = z.infer<typeof PokemonQueryDtoSchema>
-export type TeamQueryDto = z.infer<typeof TeamQueryDtoSchema> 
+export type TeamQueryDto = z.infer<typeof TeamQueryDtoSchema>

@@ -1,15 +1,16 @@
+import { PokemonEntity, PokemonQuery } from "@/entities"
 import { database } from "@/prisma/client"
-import { PokemonQuery, PokemonEntity } from "@/entities"
-import { 
-  PokemonRoSchema, 
-  PokemonListItemRoSchema,
-  PokemonWithStatsRoSchema,
-  PokemonQueryDtoSchema,
+import {
   CreatePokemonDtoSchema,
-  UpdatePokemonDtoSchema 
+  PokemonListItemRoSchema,
+  PokemonQueryDtoSchema,
+  PokemonRoSchema,
+  PokemonWithStatsRoSchema,
+  UpdatePokemonDtoSchema,
 } from "@/schemas"
 import { os } from "@orpc/server"
 import { z } from "zod"
+
 import type { ORPCContext } from "../types"
 
 const baseProcedure = os.$context<ORPCContext>()
@@ -20,12 +21,14 @@ const publicProcedure = baseProcedure.use(({ context, next }) => {
 // Get all Pokemon with filtering and pagination
 export const getAllPokemon = publicProcedure
   .input(PokemonQueryDtoSchema)
-  .output(z.object({
-    pokemon: PokemonListItemRoSchema.array(),
-    total: z.number(),
-    page: z.number(),
-    limit: z.number(),
-  }))
+  .output(
+    z.object({
+      pokemon: PokemonListItemRoSchema.array(),
+      total: z.number(),
+      page: z.number(),
+      limit: z.number(),
+    })
+  )
   .handler(async ({ input }) => {
     const { page, limit, search, typeId, minPower, maxPower, orderBy } = input
 
@@ -47,7 +50,7 @@ export const getAllPokemon = publicProcedure
     ])
 
     return {
-      pokemon: pokemon.map(p => PokemonEntity.fromPrismaToListItem(p)),
+      pokemon: pokemon.map((p) => PokemonEntity.fromPrismaToListItem(p)),
       total,
       page,
       limit,
@@ -106,7 +109,7 @@ export const updatePokemon = publicProcedure
   .output(PokemonRoSchema)
   .handler(async ({ input }) => {
     const { id, ...updateData } = input
-    
+
     const pokemon = await database.pokemon.update({
       where: { id },
       data: updateData,
@@ -135,4 +138,4 @@ export const pokemonRouter = {
   createPokemon,
   updatePokemon,
   deletePokemon,
-} 
+}

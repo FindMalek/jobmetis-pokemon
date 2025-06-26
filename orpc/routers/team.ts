@@ -1,15 +1,16 @@
+import { PokemonQuery, TeamEntity, TeamQuery } from "@/entities"
 import { database } from "@/prisma/client"
-import { TeamQuery, TeamEntity, PokemonQuery } from "@/entities"
-import { 
-  TeamRoSchema, 
-  TeamListItemRoSchema,
-  TeamSummaryRoSchema,
-  TeamQueryDtoSchema,
+import {
   CreateTeamDtoSchema,
-  UpdateTeamDtoSchema 
+  TeamListItemRoSchema,
+  TeamQueryDtoSchema,
+  TeamRoSchema,
+  TeamSummaryRoSchema,
+  UpdateTeamDtoSchema,
 } from "@/schemas"
 import { os } from "@orpc/server"
 import { z } from "zod"
+
 import type { ORPCContext } from "../types"
 
 const baseProcedure = os.$context<ORPCContext>()
@@ -20,12 +21,14 @@ const publicProcedure = baseProcedure.use(({ context, next }) => {
 // Get all teams with filtering and pagination
 export const getAllTeams = publicProcedure
   .input(TeamQueryDtoSchema)
-  .output(z.object({
-    teams: TeamListItemRoSchema.array(),
-    total: z.number(),
-    page: z.number(),
-    limit: z.number(),
-  }))
+  .output(
+    z.object({
+      teams: TeamListItemRoSchema.array(),
+      total: z.number(),
+      page: z.number(),
+      limit: z.number(),
+    })
+  )
   .handler(async ({ input }) => {
     const { page, limit, search, orderBy } = input
 
@@ -61,7 +64,7 @@ export const getAllTeams = publicProcedure
     ])
 
     return {
-      teams: teams.map(t => TeamEntity.fromPrismaToListItem(t)),
+      teams: teams.map((t) => TeamEntity.fromPrismaToListItem(t)),
       total,
       page,
       limit,
@@ -212,4 +215,4 @@ export const teamRouter = {
   createTeam,
   updateTeam,
   deleteTeam,
-} 
+}

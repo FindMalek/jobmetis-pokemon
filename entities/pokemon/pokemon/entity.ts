@@ -1,5 +1,14 @@
-import { Pokemon as PrismaPokemon, PokemonType as PrismaPokemonType } from "@prisma/client"
-import { PokemonRo, BattlePokemonRo, PokemonWithStatsRo, PokemonListItemRo } from "@/schemas"
+import {
+  BattlePokemonRo,
+  PokemonListItemRo,
+  PokemonRo,
+  PokemonWithStatsRo,
+} from "@/schemas"
+import {
+  Pokemon as PrismaPokemon,
+  PokemonType as PrismaPokemonType,
+} from "@prisma/client"
+
 import { PokemonTypeEntity } from "../pokemon-type"
 
 // Pokemon with type information
@@ -21,7 +30,9 @@ export class PokemonEntity {
   }
 
   // Convert to list item (lighter weight for lists)
-  static fromPrismaToListItem(prismaPokemon: PokemonWithType): PokemonListItemRo {
+  static fromPrismaToListItem(
+    prismaPokemon: PokemonWithType
+  ): PokemonListItemRo {
     return {
       id: prismaPokemon.id,
       name: prismaPokemon.name,
@@ -58,7 +69,10 @@ export class PokemonEntity {
   }
 
   // Apply damage to Pokemon in battle
-  static applyDamage(battlePokemon: BattlePokemonRo, damage: number): BattlePokemonRo {
+  static applyDamage(
+    battlePokemon: BattlePokemonRo,
+    damage: number
+  ): BattlePokemonRo {
     const newLife = Math.max(0, battlePokemon.currentLife - damage)
     return {
       ...battlePokemon,
@@ -69,18 +83,17 @@ export class PokemonEntity {
 
   // Check if Pokemon is valid (within power/life constraints)
   static isValidStats(power: number, life: number): boolean {
-    return (
-      power >= 10 && power <= 100 &&
-      life >= 10 && life <= 100
-    )
+    return power >= 10 && power <= 100 && life >= 10 && life <= 100
   }
 
   // Get Pokemon rarity based on total stats
-  static getRarity(pokemon: PokemonRo): "common" | "uncommon" | "rare" | "legendary" {
+  static getRarity(
+    pokemon: PokemonRo
+  ): "common" | "uncommon" | "rare" | "legendary" {
     const totalStats = pokemon.power + pokemon.life
     if (totalStats >= 160) return "legendary"
     if (totalStats >= 130) return "rare"
     if (totalStats >= 100) return "uncommon"
     return "common"
   }
-} 
+}

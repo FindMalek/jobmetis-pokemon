@@ -1,5 +1,5 @@
-import { pokemonTypeRouter } from "./pokemon-type"
 import { pokemonRouter } from "./pokemon"
+import { pokemonTypeRouter } from "./pokemon-type"
 import { teamRouter } from "./team"
 import { userRouter } from "./user"
 

@@ -20,4 +20,6 @@ export const PokemonTypeWithStatsRoSchema = PokemonTypeRoSchema.extend({
 
 export type PokemonTypeEnum = z.infer<typeof PokemonTypeEnumSchema>
 export type PokemonTypeRo = z.infer<typeof PokemonTypeRoSchema>
-export type PokemonTypeWithStatsRo = z.infer<typeof PokemonTypeWithStatsRoSchema> 
+export type PokemonTypeWithStatsRo = z.infer<
+  typeof PokemonTypeWithStatsRoSchema
+>

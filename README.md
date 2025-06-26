@@ -5,7 +5,7 @@ A modern Pokemon battle application built with Next.js, where you can manage Pok
 ## 🎮 Features
 
 - **Pokemon Management**: View and edit Pokemon with stats (power, life, type)
-- **Team Building**: Create teams of exactly 6 Pokemon 
+- **Team Building**: Create teams of exactly 6 Pokemon
 - **Battle Simulation**: Simulate battles between teams with type effectiveness
 - **Type System**: Fire, Water, and Grass types with weakness/effectiveness chart
 - **Real-time Updates**: Fast, responsive UI with modern React patterns
@@ -40,17 +40,22 @@ pnpm install
 Create a \`.env.local\` file in the root directory:
 
 \`\`\`env
+
 # Database
+
 DATABASE_URL="postgresql://username:password@localhost:5432/pokemon_battle_db"
 
 # App
+
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 NODE_ENV="development"
 
 # Auth
+
 BETTER_AUTH_SECRET="your-secret-key-min-10-chars"
 
 # Logo Dev (optional)
+
 LOGO_DEV_TOKEN="your-logo-dev-token"
 NEXT_PUBLIC_LOGO_DEV_TOKEN="your-logo-dev-token"
 \`\`\`
@@ -58,13 +63,17 @@ NEXT_PUBLIC_LOGO_DEV_TOKEN="your-logo-dev-token"
 ### 3. Setup Database
 
 \`\`\`bash
+
 # Generate Prisma client
+
 pnpm db:generate
 
 # Push schema to database
+
 pnpm db:push
 
 # Seed database with Pokemon data
+
 pnpm db:reset-and-seed
 \`\`\`
 
@@ -91,10 +100,10 @@ Visit [http://localhost:3000](http://localhost:3000) to see the application.
 The battle system uses realistic Pokemon-style mechanics:
 
 1. **1v1 Combat**: Pokemon battle individually until defeated
-2. **Damage Calculation**: \`remaining_life = current_life - opponent_power * type_factor\`
-3. **Type Effectiveness**: 
+2. **Damage Calculation**: \`remaining_life = current_life - opponent_power \* type_factor\`
+3. **Type Effectiveness**:
    - Fire vs Grass: 2.0x damage
-   - Water vs Fire: 2.0x damage  
+   - Water vs Fire: 2.0x damage
    - Grass vs Water: 2.0x damage
    - Same type: 1.0x damage
    - Weak matchups: 0.5x damage
@@ -104,6 +113,7 @@ The battle system uses realistic Pokemon-style mechanics:
 ## 🎯 Development Status
 
 ### ✅ Completed
+
 - [x] Database schema with enums and relations
 - [x] Fast seeding with createMany operations
 - [x] Entity layer with Prisma to RO converters
@@ -112,12 +122,14 @@ The battle system uses realistic Pokemon-style mechanics:
 - [x] Project cleanup and configuration
 
 ### 🚧 In Progress
+
 - [ ] Complete ORPC routes (Pokemon, Team, Battle)
 - [ ] Frontend components and pages
 - [ ] Battle simulation logic
 - [ ] UI/UX design
 
 ### 📋 Todo
+
 - [ ] Pokemon listing and management pages
 - [ ] Team builder interface
 - [ ] Battle simulator with round-by-round display
@@ -139,28 +151,31 @@ The battle system uses realistic Pokemon-style mechanics:
 ## 🏛️ Architecture
 
 ### Entity Layer
+
 - **Conversion Functions**: Prisma models → Return Objects (ROs)
 - **Query Helpers**: Reusable Prisma query builders
 - **Business Logic**: Type effectiveness, battle mechanics
 
 ### API Layer (ORPC)
+
 - **Type-safe**: Full TypeScript support
 - **Validation**: Zod schemas for inputs/outputs
 - **Context**: User authentication and database access
 
 ### Frontend Layer
+
 - **Components**: Reusable UI components with Shadcn/ui
 - **Pages**: Next.js App Router for routing
 - **Hooks**: Custom React Query hooks for data fetching
 
 ## 🔒 Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| \`DATABASE_URL\` | PostgreSQL connection string | ✅ |
-| \`BETTER_AUTH_SECRET\` | Authentication secret key | ✅ |
-| \`NEXT_PUBLIC_APP_URL\` | Public app URL | ✅ |
-| \`LOGO_DEV_TOKEN\` | Logo development token | ❌ |
+| Variable                | Description                  | Required |
+| ----------------------- | ---------------------------- | -------- |
+| \`DATABASE_URL\`        | PostgreSQL connection string | ✅       |
+| \`BETTER_AUTH_SECRET\`  | Authentication secret key    | ✅       |
+| \`NEXT_PUBLIC_APP_URL\` | Public app URL               | ✅       |
+| \`LOGO_DEV_TOKEN\`      | Logo development token       | ❌       |
 
 ## 🤝 Contributing
 
