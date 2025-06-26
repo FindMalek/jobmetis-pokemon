@@ -54,12 +54,6 @@ NODE_ENV="development"
 
 BETTER_AUTH_SECRET="your-secret-key-min-10-chars"
 
-# Logo Dev (optional)
-
-LOGO_DEV_TOKEN="your-logo-dev-token"
-NEXT_PUBLIC_LOGO_DEV_TOKEN="your-logo-dev-token"
-\`\`\`
-
 ### 3. Setup Database
 
 \`\`\`bash
