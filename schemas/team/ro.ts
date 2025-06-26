@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-import { PokemonRoSchema } from "./pokemon"
+import { PokemonRoSchema } from "../pokemon/ro"
 
 // Team Return Object Schema
 export const TeamRoSchema = z.object({

@@ -112,6 +112,7 @@ Transform the existing template into a Pokemon Battle Application with:
 ## 🎯 Next Immediate Steps
 
 1. **✅ COMPLETED: Backend Setup**
+
    ```bash
    ✅ Database schema pushed
    ✅ Database seeded with Pokemon data
@@ -119,12 +120,14 @@ Transform the existing template into a Pokemon Battle Application with:
    ✅ Battle simulation logic implemented
    ```
 
-2. **Clean Up Frontend Components** 
+2. **Clean Up Frontend Components**
+
    - Remove old template components
    - Fix missing schema imports
    - Update dashboard for Pokemon app
 
 3. **Test Backend API**
+
    - Test all ORPC routes
    - Verify Pokemon/Team operations
    - Test battle simulation endpoints

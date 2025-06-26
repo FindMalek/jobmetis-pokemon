@@ -19,11 +19,47 @@ export class TeamQuery {
     }
   }
 
+  // Include for battle operations (same as getInclude but explicit)
+  static getBattleInclude(): Prisma.TeamInclude {
+    return {
+      members: {
+        include: {
+          pokemon: {
+            include: {
+              type: true,
+            },
+          },
+        },
+        orderBy: {
+          position: "asc",
+        },
+      },
+    }
+  }
+
   // Where clause for teams with full members
   static getCompleteTeamsWhere(): Prisma.TeamWhereInput {
     return {
       members: {
         some: {},
+      },
+    }
+  }
+
+  // Where clause for teams with exactly 6 members (battle-ready)
+  static getBattleReadyTeamsWhere(): Prisma.TeamWhereInput {
+    return {
+      members: {
+        some: {},
+      },
+    }
+  }
+
+  // Where clause for getting teams by IDs
+  static getByIdsWhere(teamIds: string[]): Prisma.TeamWhereInput {
+    return {
+      id: {
+        in: teamIds,
       },
     }
   }

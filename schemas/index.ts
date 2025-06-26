@@ -1,2 +1,5 @@
 export * from "./user"
 export * from "./pokemon"
+export * from "./pokemon-type"
+export * from "./team"
+export * from "./battle"

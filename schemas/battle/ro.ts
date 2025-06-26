@@ -1,10 +1,10 @@
 import { z } from "zod"
 
-import { BattlePokemonRoSchema } from "./pokemon"
-import { BattleTeamRoSchema } from "./team"
+import { BattlePokemonRoSchema } from "../pokemon/ro"
+import { BattleTeamRoSchema } from "../team/ro"
 
 // Battle Round Result
-export const BattleRoundSchema = z.object({
+export const BattleRoundRoSchema = z.object({
   roundNumber: z.number().min(1),
   pokemon1: BattlePokemonRoSchema,
   pokemon2: BattlePokemonRoSchema,
@@ -17,11 +17,11 @@ export const BattleRoundSchema = z.object({
 })
 
 // Complete Battle Result
-export const BattleResultSchema = z.object({
+export const BattleResultRoSchema = z.object({
   id: z.string(),
   team1: BattleTeamRoSchema,
   team2: BattleTeamRoSchema,
-  rounds: z.array(BattleRoundSchema),
+  rounds: z.array(BattleRoundRoSchema),
   winner: z.enum(["team1", "team2"]).optional(),
   totalRounds: z.number(),
   battleDuration: z.number(), // in milliseconds
@@ -29,7 +29,7 @@ export const BattleResultSchema = z.object({
 })
 
 // Battle Summary (for history)
-export const BattleSummarySchema = z.object({
+export const BattleSummaryRoSchema = z.object({
   id: z.string(),
   team1Name: z.string(),
   team2Name: z.string(),
@@ -38,6 +38,6 @@ export const BattleSummarySchema = z.object({
   createdAt: z.date(),
 })
 
-export type BattleRound = z.infer<typeof BattleRoundSchema>
-export type BattleResult = z.infer<typeof BattleResultSchema>
-export type BattleSummary = z.infer<typeof BattleSummarySchema>
+export type BattleRoundRo = z.infer<typeof BattleRoundRoSchema>
+export type BattleResultRo = z.infer<typeof BattleResultRoSchema>
+export type BattleSummaryRo = z.infer<typeof BattleSummaryRoSchema>
