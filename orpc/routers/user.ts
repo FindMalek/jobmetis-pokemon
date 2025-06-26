@@ -1,8 +1,6 @@
 import { database } from "@/prisma/client"
 import {
-  getEncryptedDataCountOutputSchema,
   getUserCountOutputSchema,
-  type GetEncryptedDataCountOutput,
   type GetUserCountOutput,
 } from "@/schemas/user/statistics"
 import {
@@ -137,19 +135,9 @@ export const getUserCount = publicProcedure
     return { total }
   })
 
-// Get encrypted data count
-export const getEncryptedDataCount = publicProcedure
-  .input(z.object({}))
-  .output(getEncryptedDataCountOutputSchema)
-  .handler(async (): Promise<GetEncryptedDataCountOutput> => {
-    const count = await database.encryptedData.count()
-    return { count }
-  })
-
 // Export the user router
 export const userRouter = {
   joinWaitlist,
   getWaitlistCount,
   getUserCount,
-  getEncryptedDataCount,
 }

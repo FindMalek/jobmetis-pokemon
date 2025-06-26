@@ -4,11 +4,12 @@ A modern Pokemon battle application built with Next.js, where you can manage Pok
 
 ## 🎮 Features
 
-- **Pokemon Management**: View and edit Pokemon with stats (power, life, type)
-- **Team Building**: Create teams of exactly 6 Pokemon
+- **Pokemon Management**: View, create, and edit Pokemon with stats (power, life, type)
+- **Team Building**: Create teams of exactly 6 Pokemon with automatic power calculation
 - **Battle Simulation**: Simulate battles between teams with type effectiveness
 - **Type System**: Fire, Water, and Grass types with weakness/effectiveness chart
 - **Real-time Updates**: Fast, responsive UI with modern React patterns
+- **Type Safety**: Full TypeScript implementation with Zod validation
 
 ## 🏗️ Tech Stack
 
@@ -18,6 +19,7 @@ A modern Pokemon battle application built with Next.js, where you can manage Pok
 - **Database**: PostgreSQL (Supabase recommended)
 - **Authentication**: BetterAuth
 - **State Management**: React Query (TanStack Query)
+- **Validation**: Zod schemas for all operations
 
 ## 🚀 Quick Start
 
@@ -88,6 +90,7 @@ Visit [http://localhost:3000](http://localhost:3000) to see the application.
 - **weakness**: Type effectiveness chart (damage multipliers)
 - **team**: Pokemon teams with calculated total power
 - **team_member**: Junction table for team composition (6 Pokemon per team)
+- **battle**: Battle records with results and statistics
 
 ### Battle Logic
 
@@ -106,29 +109,35 @@ The battle system uses realistic Pokemon-style mechanics:
 
 ## 🎯 Development Status
 
-### ✅ Completed
+### ✅ Backend Complete
 
 - [x] Database schema with enums and relations
 - [x] Fast seeding with createMany operations
 - [x] Entity layer with Prisma to RO converters
 - [x] Zod schemas for validation
-- [x] Basic ORPC router structure
-- [x] Project cleanup and configuration
+- [x] Complete ORPC routes (Pokemon, Team, Battle, PokemonType)
+- [x] Battle simulation logic with type effectiveness
+- [x] Build passes with zero TypeScript errors
+- [x] All unused code cleaned up
 
-### 🚧 In Progress
+### 🚧 Frontend In Progress
 
-- [ ] Complete ORPC routes (Pokemon, Team, Battle)
-- [ ] Frontend components and pages
-- [ ] Battle simulation logic
-- [ ] UI/UX design
-
-### 📋 Todo
-
+- [x] Project setup and basic structure
+- [x] Authentication pages (login/register)
+- [x] Marketing pages with Pokemon-themed stats
 - [ ] Pokemon listing and management pages
 - [ ] Team builder interface
 - [ ] Battle simulator with round-by-round display
 - [ ] Responsive design and animations
+
+### 📋 Todo
+
+- [ ] Complete Pokemon CRUD interface
+- [ ] Drag-and-drop team builder
+- [ ] Interactive battle visualization
+- [ ] Type effectiveness chart display
 - [ ] Error handling and loading states
+- [ ] Mobile-responsive design
 
 ## 🔧 Available Scripts
 
@@ -142,25 +151,21 @@ The battle system uses realistic Pokemon-style mechanics:
 - \`pnpm db:studio\` - Open Prisma Studio
 - \`pnpm db:reset-and-seed\` - Reset and seed database
 
-## 🏛️ Architecture
+## ��️ Architecture
 
-### Entity Layer
+### Backend (Complete ✅)
 
-- **Conversion Functions**: Prisma models → Return Objects (ROs)
+- **Entity Layer**: Prisma models → Return Objects (ROs)
 - **Query Helpers**: Reusable Prisma query builders
 - **Business Logic**: Type effectiveness, battle mechanics
+- **ORPC Routes**: Type-safe API with Zod validation
 
-### API Layer (ORPC)
-
-- **Type-safe**: Full TypeScript support
-- **Validation**: Zod schemas for inputs/outputs
-- **Context**: User authentication and database access
-
-### Frontend Layer
+### Frontend (In Progress 🚧)
 
 - **Components**: Reusable UI components with Shadcn/ui
 - **Pages**: Next.js App Router for routing
 - **Hooks**: Custom React Query hooks for data fetching
+- **State**: React Query for server state management
 
 ## 🔒 Environment Variables
 
@@ -170,6 +175,31 @@ The battle system uses realistic Pokemon-style mechanics:
 | \`BETTER_AUTH_SECRET\`  | Authentication secret key    | ✅       |
 | \`NEXT_PUBLIC_APP_URL\` | Public app URL               | ✅       |
 | \`LOGO_DEV_TOKEN\`      | Logo development token       | ❌       |
+
+## 🎮 API Endpoints
+
+### Pokemon Management
+
+- \`GET /api/orpc/pokemon.getAllPokemon\` - List Pokemon with filtering
+- \`POST /api/orpc/pokemon.createPokemon\` - Create new Pokemon
+- \`PUT /api/orpc/pokemon.updatePokemon\` - Update existing Pokemon
+- \`DELETE /api/orpc/pokemon.deletePokemon\` - Delete Pokemon
+
+### Team Management
+
+- \`GET /api/orpc/team.getAllTeams\` - List all teams
+- \`POST /api/orpc/team.createTeam\` - Create team (6 Pokemon required)
+- \`GET /api/orpc/team.getTeamById\` - Get team details
+
+### Battle System
+
+- \`POST /api/orpc/battle.startBattle\` - Start battle between teams
+- \`GET /api/orpc/battle.getBattleResults\` - Get battle history
+
+### Type System
+
+- \`GET /api/orpc/pokemonType.getAllTypes\` - List all Pokemon types
+- \`GET /api/orpc/pokemonType.getEffectivenessChart\` - Type effectiveness data
 
 ## 🤝 Contributing
 
@@ -188,3 +218,5 @@ This is a job interview project, but contributions and suggestions are welcome!
 ---
 
 **Built with ❤️ for the Pokemon Battle Arena job interview project**
+
+**Status: Backend Complete ✅ | Frontend In Progress 🚧**

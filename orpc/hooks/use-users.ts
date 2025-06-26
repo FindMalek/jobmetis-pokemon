@@ -8,7 +8,6 @@ export const userKeys = {
   all: ["users"] as const,
   waitlistCount: () => [...userKeys.all, "waitlistCount"] as const,
   userCount: () => [...userKeys.all, "userCount"] as const,
-  encryptedDataCount: () => [...userKeys.all, "encryptedDataCount"] as const,
 }
 
 // Join waitlist mutation
@@ -16,7 +15,7 @@ export function useJoinWaitlist() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: orpc.users.joinWaitlist.call,
+    mutationFn: orpc.user.joinWaitlist.call,
     onSuccess: (data) => {
       if (data.success) {
         // Invalidate waitlist count to refetch
@@ -35,7 +34,7 @@ export function useJoinWaitlist() {
 export function useWaitlistCount() {
   return useQuery({
     queryKey: userKeys.waitlistCount(),
-    queryFn: () => orpc.users.getWaitlistCount.call({}),
+    queryFn: () => orpc.user.getWaitlistCount.call({}),
     staleTime: 30 * 1000, // 30 seconds - more responsive for waitlist count
     refetchOnWindowFocus: true, // Refetch when user returns to the page
   })
@@ -45,16 +44,7 @@ export function useWaitlistCount() {
 export function useUserCount() {
   return useQuery({
     queryKey: userKeys.userCount(),
-    queryFn: () => orpc.users.getUserCount.call({}),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  })
-}
-
-// Get encrypted data count
-export function useEncryptedDataCount() {
-  return useQuery({
-    queryKey: userKeys.encryptedDataCount(),
-    queryFn: () => orpc.users.getEncryptedDataCount.call({}),
+    queryFn: () => orpc.user.getUserCount.call({}),
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
 }

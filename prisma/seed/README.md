@@ -1,131 +1,172 @@
-# Database Seed Data
+# Pokemon Battle Arena - Database Seed Data
 
-This directory contains seed data for the database. The following data is seeded by default:
+This directory contains seed data for the Pokemon Battle Arena database. The seeding process creates a complete Pokemon ecosystem with types, Pokemon, teams, and battle mechanics.
 
-## Security & Encryption
+## 🎯 Seeded Data Overview
 
-🔐 **All sensitive data is properly encrypted using AES-256-CBC encryption:**
+The database is seeded with a comprehensive Pokemon battle system including:
 
-- **Card Numbers & CVV codes** - Encrypted using dedicated encryption keys and IVs
-- **Credential Passwords** - Encrypted with bcrypt hashing + AES encryption
-- **Secret Values** - All secret values (API keys, tokens, etc.) encrypted using AES-256
-- **User Passwords** - Hashed using bcryptjs with salt rounds for authentication
+- **Pokemon Types** with type effectiveness mechanics
+- **Pokemon** with balanced stats and type relationships
+- **Teams** with strategic Pokemon combinations
+- **Weakness Chart** for battle calculations
+- **Sample Users** for testing authentication
 
-The seeding process uses a dedicated encryption utility (`./encryption.ts`) that implements:
+## 🔥 Pokemon Types
 
-- AES-256-CBC encryption for all sensitive data
-- Unique initialization vectors (IVs) for different data types
-- Secure key management for development environments
-- Proper encryption/decryption workflows
+### Fire Type
 
-## Seeded Users
+- **Color**: Red (#ff6b6b)
+- **Strengths**: Effective against Grass (2.0x damage)
+- **Weaknesses**: Weak against Water (0.5x damage)
 
-### 1. John Doe
+### Water Type
 
-- **Email**: <john.doe@example.com>
-- **Password**: SecurePass123!
-- **Avatar**: <https://avatar.vercel.sh/john.doe>
+- **Color**: Blue (#4fc3f7)
+- **Strengths**: Effective against Fire (2.0x damage)
+- **Weaknesses**: Weak against Grass (0.5x damage)
 
-### 2. Jane Smith
+### Grass Type
 
-- **Email**: <jane.smith@example.com>
-- **Password**: SecurePass123!
-- **Avatar**: <https://avatar.vercel.sh/jane.smith>
+- **Color**: Green (#66bb6a)
+- **Strengths**: Effective against Water (2.0x damage)
+- **Weaknesses**: Weak against Fire (0.5x damage)
 
-### 3. Mike Johnson
+## 🎮 Seeded Pokemon
 
-- **Email**: <mike.johnson@example.com>
-- **Password**: SecurePass123!
-- **Avatar**: <https://avatar.vercel.sh/mike.johnson>
+The seeder creates **15 Pokemon** with balanced stats:
 
-## Seeded Platforms
+### Fire Pokemon (5 total)
 
-- Google
-- GitHub
-- AWS
-- Microsoft
+- **Charmander** - Power: 45, Life: 39
+- **Charmeleon** - Power: 58, Life: 58
+- **Charizard** - Power: 84, Life: 78
+- **Vulpix** - Power: 41, Life: 38
+- **Ninetales** - Power: 76, Life: 73
 
-## Seeded Containers
+### Water Pokemon (5 total)
 
-Each user has the following containers with specific purposes:
+- **Squirtle** - Power: 48, Life: 44
+- **Wartortle** - Power: 63, Life: 59
+- **Blastoise** - Power: 83, Life: 79
+- **Psyduck** - Power: 52, Life: 50
+- **Golduck** - Power: 82, Life: 80
 
-- **Personal** (Mixed) - Personal accounts and credentials
-- **Work** (Mixed) - Work-related accounts and credentials
-- **Finance** (Cards Only) - Financial accounts and payment information
-- **Environment Variables** (Secrets Only) - Development environment secrets and API keys
+### Grass Pokemon (5 total)
 
-## Seeded Tags
+- **Bulbasaur** - Power: 49, Life: 45
+- **Ivysaur** - Power: 62, Life: 60
+- **Venusaur** - Power: 82, Life: 83
+- **Oddish** - Power: 50, Life: 45
+- **Vileplume** - Power: 80, Life: 75
 
-Each user has the following common tags:
+## ⚔️ Battle Mechanics
 
-- Important (#FF5733)
-- Personal (#33FF57)
-- Work (#3357FF)
-- Finance (#F3FF33)
-- Social (#FF33F3)
+### Type Effectiveness Chart
 
-Additional container-specific tags are also created.
+The weakness table defines battle damage multipliers:
 
-## Seeded Credentials
+| Attacking | Defending | Damage Factor             |
+| --------- | --------- | ------------------------- |
+| Fire      | Grass     | 2.0x (Super Effective)    |
+| Water     | Fire      | 2.0x (Super Effective)    |
+| Grass     | Water     | 2.0x (Super Effective)    |
+| Same Type | Same Type | 1.0x (Normal)             |
+| Fire      | Water     | 0.5x (Not Very Effective) |
+| Water     | Grass     | 0.5x (Not Very Effective) |
+| Grass     | Fire      | 0.5x (Not Very Effective) |
 
-Each user has the following **encrypted** credentials:
+### Battle Calculation
 
-- **Google account** - Personal email with encrypted password
-- **GitHub account** - Development account with encrypted password and 2FA metadata
-- **AWS account** - Work account with encrypted password (in Work container)
+Damage is calculated using:
 
-All credential passwords are properly encrypted and stored securely.
+```
+remaining_life = current_life - (opponent_power * type_effectiveness_factor)
+```
 
-## Seeded Cards
+## 🏆 Sample Teams
 
-Each user has the following **encrypted** payment cards in their Finance container:
+The seeder creates balanced teams for testing:
 
-- **Visa Credit Card**
-  - Card Number: `4111111111111111` (encrypted)
-  - CVV: `123` (encrypted)
-  - Expiry: 2025-12-31
-- **Mastercard**
-  - Card Number: `5555555555554444` (encrypted)
-  - CVV: `321` (encrypted)
-  - Expiry: 2024-10-31
+### Fire Team
 
-Card numbers and CVV codes are encrypted using AES-256 encryption.
+- Charizard, Ninetales, Charmander, Charmeleon, Vulpix + 1 more
+- **Total Power**: ~400+ combined
 
-## Seeded Secrets
+### Water Team
 
-Each user has the following **encrypted** secrets:
+- Blastoise, Golduck, Wartortle, Squirtle, Psyduck + 1 more
+- **Total Power**: ~400+ combined
 
-### Environment Variables Container:
+### Grass Team
 
-- **DATABASE_URL** - PostgreSQL connection string (encrypted)
-- **API_KEY** - Main API key for external services (encrypted)
-- **JWT_SECRET** - JWT token signing secret (encrypted)
-- **REDIS_URL** - Redis connection URL (encrypted)
-- **STRIPE_SECRET_KEY** - Stripe payment processing key (encrypted)
+- Venusaur, Vileplume, Ivysaur, Bulbasaur, Oddish + 1 more
+- **Total Power**: ~400+ combined
 
-### Work Container (Legacy):
+Each team contains exactly **6 Pokemon** as required by the battle system.
 
-- **AWS Access Key** - AWS API key (encrypted)
-- **GitHub Personal Access Token** - GitHub API access token (encrypted)
+## 👤 Test Users
 
-All secret values are encrypted using AES-256-CBC encryption.
+The seeder creates sample users for authentication testing:
 
-## Running the Seeder
+### Demo User
 
-To run the seeder, use the following command:
+- **Email**: demo@pokemon.com
+- **Password**: Demo123!
+- **Role**: User
+
+### Admin User
+
+- **Email**: admin@pokemon.com
+- **Password**: Admin123!
+- **Role**: Admin
+
+## 🚀 Running the Seeder
+
+To populate the database with Pokemon data:
 
 ```bash
+# Reset database and seed with fresh data
+pnpm db:reset-and-seed
+
+# Or run seeding only (if schema exists)
 pnpm db:seed
 ```
 
-## Security Notes
+## 📊 Seeded Statistics
 
-⚠️ **Important Security Information:**
+- **15 Pokemon** across 3 types
+- **3 Pokemon Types** with balanced effectiveness
+- **9 Type Effectiveness** relationships
+- **3+ Sample Teams** for battle testing
+- **2 Test Users** for authentication
+- **1 Waitlist Entry** for marketing features
 
-1. **Development Only**: The encryption keys used in seeding are for development purposes only
-2. **Production**: In production, use proper key management systems (AWS KMS, Azure Key Vault, etc.)
-3. **Key Rotation**: Implement proper key rotation policies in production environments
-4. **Access Control**: Ensure proper access controls are in place for encrypted data
-5. **Compliance**: Follow your organization's security and compliance requirements
+## 🎯 Battle Strategy
 
-The seeded data demonstrates the full encryption workflow that should be implemented in production environments.
+The seeded Pokemon are balanced for strategic gameplay:
+
+- **Evolution Lines**: Starter Pokemon can evolve (Charmander → Charmeleon → Charizard)
+- **Stat Distribution**: Balanced power/life ratios for fair battles
+- **Type Coverage**: Each type has strong and weak Pokemon
+- **Team Variety**: Multiple team compositions possible
+
+## 🔧 Customization
+
+To add more Pokemon or modify existing ones:
+
+1. Edit `prisma/seed/pokemon.ts`
+2. Update Pokemon stats and types
+3. Run `pnpm db:reset-and-seed`
+
+## 📝 Notes
+
+- All Pokemon images use placeholder URLs
+- Stats are based on simplified Pokemon mechanics
+- Battle system supports unlimited Pokemon expansion
+- Type effectiveness follows rock-paper-scissors pattern (Fire → Grass → Water → Fire)
+- Teams must contain exactly 6 Pokemon for battles
+
+---
+
+**The seeded database provides a complete Pokemon Battle Arena experience ready for frontend development!**
