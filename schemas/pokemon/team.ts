@@ -22,14 +22,29 @@ export const BattleTeamRoSchema = z.object({
 })
 
 // Team summary (for listing)
-export const TeamSummarySchema = z.object({
+export const TeamSummaryRoSchema = z.object({
   id: z.string(),
   name: z.string(),
   totalPower: z.number(),
-  memberCount: z.number(),
+  memberCount: z.number().default(6),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+})
+
+// Team list item (minimal data for team lists)
+export const TeamListItemRoSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  totalPower: z.number(),
+  memberPreviews: z.array(z.object({
+    name: z.string(),
+    image: z.string(),
+    typeName: z.string(),
+  })).max(3), // Show first 3 Pokemon as preview
   createdAt: z.date(),
 })
 
 export type TeamRo = z.infer<typeof TeamRoSchema>
 export type BattleTeamRo = z.infer<typeof BattleTeamRoSchema>
-export type TeamSummary = z.infer<typeof TeamSummarySchema> 
+export type TeamSummaryRo = z.infer<typeof TeamSummaryRoSchema>
+export type TeamListItemRo = z.infer<typeof TeamListItemRoSchema> 

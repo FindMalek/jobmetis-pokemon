@@ -1,3 +1,10 @@
+// Pokemon Type Enum
+enum PokemonTypeEnum {
+  FIRE
+  WATER
+  GRASS
+}
+
 // Pokemon Type Table
 model PokemonType {
   id       String @id @default(cuid())

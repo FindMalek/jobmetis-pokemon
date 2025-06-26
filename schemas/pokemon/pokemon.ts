@@ -18,12 +18,24 @@ export const BattlePokemonRoSchema = PokemonRoSchema.extend({
 })
 
 // Pokemon with additional computed fields
-export const PokemonWithStatsSchema = PokemonRoSchema.extend({
+export const PokemonWithStatsRoSchema = PokemonRoSchema.extend({
   rarity: z.enum(["common", "uncommon", "rare", "legendary"]),
   totalStats: z.number(),
-  usageCount: z.number().optional(),
+  usageCount: z.number().default(0),
+})
+
+// Pokemon list item (minimal data for lists)
+export const PokemonListItemRoSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  image: z.string().url(),
+  power: z.number(),
+  life: z.number(),
+  typeName: z.string(),
+  typeColor: z.string(),
 })
 
 export type PokemonRo = z.infer<typeof PokemonRoSchema>
 export type BattlePokemonRo = z.infer<typeof BattlePokemonRoSchema>
-export type PokemonWithStats = z.infer<typeof PokemonWithStatsSchema> 
+export type PokemonWithStatsRo = z.infer<typeof PokemonWithStatsRoSchema>
+export type PokemonListItemRo = z.infer<typeof PokemonListItemRoSchema> 

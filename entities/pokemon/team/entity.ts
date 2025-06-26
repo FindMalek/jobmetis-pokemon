@@ -1,5 +1,6 @@
 import { Team as PrismaTeam, TeamMember as PrismaTeamMember, Pokemon as PrismaPokemon, PokemonType as PrismaPokemonType } from "@prisma/client"
-import { PokemonEntity, PokemonRo } from "../pokemon"
+import { TeamRo, BattleTeamRo, TeamSummaryRo, TeamListItemRo } from "@/schemas"
+import { PokemonEntity } from "../pokemon"
 
 // Team member with full Pokemon data
 type TeamMemberWithPokemon = PrismaTeamMember & {
@@ -11,26 +12,6 @@ type TeamMemberWithPokemon = PrismaTeamMember & {
 // Team with members
 type TeamWithMembers = PrismaTeam & {
   members: TeamMemberWithPokemon[]
-}
-
-// Return Object for Team
-export interface TeamRo {
-  id: string
-  name: string
-  totalPower: number
-  members: PokemonRo[]
-  createdAt: Date
-  updatedAt: Date
-}
-
-// Battle Team (for battle simulation)
-export interface BattleTeamRo {
-  id: string
-  name: string
-  members: PokemonRo[]
-  currentPokemonIndex: number
-  defeatedCount: number
-  isDefeated: boolean
 }
 
 export class TeamEntity {
@@ -50,6 +31,37 @@ export class TeamEntity {
     }
   }
 
+  // Convert to summary (lighter weight)
+  static fromPrismaToSummary(prismaTeam: TeamWithMembers): TeamSummaryRo {
+    return {
+      id: prismaTeam.id,
+      name: prismaTeam.name,
+      totalPower: prismaTeam.totalPower,
+      memberCount: prismaTeam.members.length,
+      createdAt: prismaTeam.createdAt,
+      updatedAt: prismaTeam.updatedAt,
+    }
+  }
+
+  // Convert to list item (for team lists)
+  static fromPrismaToListItem(prismaTeam: TeamWithMembers): TeamListItemRo {
+    const memberPreviews = prismaTeam.members
+      .slice(0, 3) // Take first 3 Pokemon
+      .map(member => ({
+        name: member.pokemon.name,
+        image: member.pokemon.image,
+        typeName: member.pokemon.type.name.toLowerCase(),
+      }))
+
+    return {
+      id: prismaTeam.id,
+      name: prismaTeam.name,
+      totalPower: prismaTeam.totalPower,
+      memberPreviews,
+      createdAt: prismaTeam.createdAt,
+    }
+  }
+
   // Convert Team to Battle Team
   static toBattleTeam(team: TeamRo): BattleTeamRo {
     return {
@@ -63,17 +75,17 @@ export class TeamEntity {
   }
 
   // Calculate total power from Pokemon array
-  static calculateTotalPower(pokemon: PokemonRo[]): number {
+  static calculateTotalPower(pokemon: Array<{ power: number }>): number {
     return pokemon.reduce((total, p) => total + p.power, 0)
   }
 
   // Validate team (must have exactly 6 Pokemon)
-  static isValidTeam(pokemon: PokemonRo[]): boolean {
-    return pokemon.length === 6
+  static isValidTeam(pokemonIds: string[]): boolean {
+    return pokemonIds.length === 6
   }
 
   // Get next active Pokemon for battle
-  static getNextActivePokemon(battleTeam: BattleTeamRo): PokemonRo | null {
+  static getNextActivePokemon(battleTeam: BattleTeamRo): TeamRo["members"][0] | null {
     if (battleTeam.currentPokemonIndex >= battleTeam.members.length) {
       return null
     }

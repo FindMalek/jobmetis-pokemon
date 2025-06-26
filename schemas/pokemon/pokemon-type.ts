@@ -8,14 +8,16 @@ export const PokemonTypeRoSchema = z.object({
   id: z.string(),
   name: z.string(),
   displayName: z.string(),
+  color: z.string(),
 })
 
-// Pokemon Type with stats
-export const PokemonTypeWithStatsSchema = PokemonTypeRoSchema.extend({
-  pokemonCount: z.number().optional(),
-  averagePower: z.number().optional(),
+// Pokemon Type with stats for admin/analytics
+export const PokemonTypeWithStatsRoSchema = PokemonTypeRoSchema.extend({
+  pokemonCount: z.number(),
+  averagePower: z.number(),
+  averageLife: z.number(),
 })
 
 export type PokemonTypeEnum = z.infer<typeof PokemonTypeEnumSchema>
 export type PokemonTypeRo = z.infer<typeof PokemonTypeRoSchema>
-export type PokemonTypeWithStats = z.infer<typeof PokemonTypeWithStatsSchema> 
+export type PokemonTypeWithStatsRo = z.infer<typeof PokemonTypeWithStatsRoSchema> 
