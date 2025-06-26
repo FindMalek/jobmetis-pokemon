@@ -1,2 +1,2 @@
-export * from "./pokemon/ro"
+export * from "./ro"
 export * from "./dto"

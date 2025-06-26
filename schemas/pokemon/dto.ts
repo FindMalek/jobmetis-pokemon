@@ -1,7 +1,7 @@
 import { z } from "zod"
 
 // Pokemon DTOs (Data Transfer Objects)
-export const CreatePokemonDtoSchema = z.object({
+export const createPokemonDtoSchema = z.object({
   name: z.string().min(1).max(50),
   typeId: z.string(),
   image: z.string().url(),
@@ -9,12 +9,12 @@ export const CreatePokemonDtoSchema = z.object({
   life: z.number().min(10).max(100),
 })
 
-export const UpdatePokemonDtoSchema = CreatePokemonDtoSchema.partial().extend({
+export const updatePokemonDtoSchema = createPokemonDtoSchema.partial().extend({
   id: z.string(),
 })
 
 // Query DTOs
-export const PokemonQueryDtoSchema = z.object({
+export const pokemonQueryDtoSchema = z.object({
   search: z.string().optional(),
   typeId: z.string().optional(),
   minPower: z.number().min(10).max(100).optional(),
@@ -24,6 +24,6 @@ export const PokemonQueryDtoSchema = z.object({
   limit: z.number().min(1).max(100).default(20),
 })
 
-export type CreatePokemonDto = z.infer<typeof CreatePokemonDtoSchema>
-export type UpdatePokemonDto = z.infer<typeof UpdatePokemonDtoSchema>
-export type PokemonQueryDto = z.infer<typeof PokemonQueryDtoSchema>
+export type CreatePokemonDto = z.infer<typeof createPokemonDtoSchema>
+export type UpdatePokemonDto = z.infer<typeof updatePokemonDtoSchema>
+export type PokemonQueryDto = z.infer<typeof pokemonQueryDtoSchema>

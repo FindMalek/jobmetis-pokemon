@@ -1,29 +1,29 @@
 import { z } from "zod"
 
-import { PokemonRoSchema } from "../pokemon/ro"
+import { pokemonRoSchema } from "../pokemon/ro"
 
 // Team Return Object Schema
-export const TeamRoSchema = z.object({
+export const teamRoSchema = z.object({
   id: z.string(),
   name: z.string(),
   totalPower: z.number(),
-  members: z.array(PokemonRoSchema).length(6),
+  members: z.array(pokemonRoSchema).length(6),
   createdAt: z.date(),
   updatedAt: z.date(),
 })
 
 // Battle Team Schema (for battle simulation)
-export const BattleTeamRoSchema = z.object({
+export const battleTeamRoSchema = z.object({
   id: z.string(),
   name: z.string(),
-  members: z.array(PokemonRoSchema).length(6),
+  members: z.array(pokemonRoSchema).length(6),
   currentPokemonIndex: z.number().min(0).max(5),
   defeatedCount: z.number().min(0).max(6),
   isDefeated: z.boolean(),
 })
 
 // Team summary (for listing)
-export const TeamSummaryRoSchema = z.object({
+export const teamSummaryRoSchema = z.object({
   id: z.string(),
   name: z.string(),
   totalPower: z.number(),
@@ -33,7 +33,7 @@ export const TeamSummaryRoSchema = z.object({
 })
 
 // Team list item (minimal data for team lists)
-export const TeamListItemRoSchema = z.object({
+export const teamListItemRoSchema = z.object({
   id: z.string(),
   name: z.string(),
   totalPower: z.number(),
@@ -49,7 +49,7 @@ export const TeamListItemRoSchema = z.object({
   createdAt: z.date(),
 })
 
-export type TeamRo = z.infer<typeof TeamRoSchema>
-export type BattleTeamRo = z.infer<typeof BattleTeamRoSchema>
-export type TeamSummaryRo = z.infer<typeof TeamSummaryRoSchema>
-export type TeamListItemRo = z.infer<typeof TeamListItemRoSchema>
+export type TeamRo = z.infer<typeof teamRoSchema>
+export type BattleTeamRo = z.infer<typeof battleTeamRoSchema>
+export type TeamSummaryRo = z.infer<typeof teamSummaryRoSchema>
+export type TeamListItemRo = z.infer<typeof teamListItemRoSchema>

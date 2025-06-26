@@ -1,218 +1,153 @@
-import { PokemonQuery, TeamEntity, TeamQuery } from "@/entities"
-import { database } from "@/prisma/client"
+import { publicProcedure, router } from "../context"
+import { TeamEntity, TeamQuery } from "@/entities/pokemon"
 import {
-  CreateTeamDtoSchema,
-  TeamListItemRoSchema,
-  TeamQueryDtoSchema,
-  TeamRoSchema,
-  TeamSummaryRoSchema,
-  UpdateTeamDtoSchema,
-} from "@/schemas"
-import { os } from "@orpc/server"
+  teamRoSchema,
+} from "@/schemas/team"
 import { z } from "zod"
 
-import type { ORPCContext } from "../types"
-
-const baseProcedure = os.$context<ORPCContext>()
-const publicProcedure = baseProcedure.use(({ context, next }) => {
-  return next({ context })
-})
-
-// Get all teams with filtering and pagination
-export const getAllTeams = publicProcedure
-  .input(TeamQueryDtoSchema)
-  .output(
-    z.object({
-      teams: TeamListItemRoSchema.array(),
-      total: z.number(),
-      page: z.number(),
-      limit: z.number(),
-    })
-  )
-  .handler(async ({ input }) => {
-    const { page, limit, search, orderBy } = input
-
-    let where = TeamQuery.getCompleteTeamsWhere()
-    if (search) {
-      where = {
-        ...where,
-        ...TeamQuery.getByNameWhere(search),
-      }
-    }
-
-    let orderByClause
-    switch (orderBy) {
-      case "power":
-        orderByClause = TeamQuery.getOrderByPower()
-        break
-      case "date":
-        orderByClause = TeamQuery.getOrderByDate()
-        break
-      default:
-        orderByClause = [{ name: "asc" }]
-    }
-
-    const [teams, total] = await Promise.all([
-      database.team.findMany({
-        where,
-        include: TeamQuery.getInclude(),
-        orderBy: orderByClause,
-        skip: (page - 1) * limit,
-        take: limit,
-      }),
-      database.team.count({ where }),
-    ])
-
-    return {
-      teams: teams.map((t) => TeamEntity.fromPrismaToListItem(t)),
-      total,
-      page,
-      limit,
-    }
-  })
-
-// Get team by ID
-export const getTeamById = publicProcedure
-  .input(z.object({ id: z.string() }))
-  .output(TeamRoSchema)
-  .handler(async ({ input }) => {
-    const team = await database.team.findUniqueOrThrow({
-      where: { id: input.id },
+export const teamRouter = router({
+  // List all teams
+  list: publicProcedure.query(async ({ ctx }) => {
+    const teams = await ctx.db.team.findMany({
       include: TeamQuery.getInclude(),
+      orderBy: { createdAt: "desc" },
     })
 
-    return TeamEntity.fromPrisma(team)
-  })
+    return teams.map((team) => TeamEntity.fromPrisma(team))
+  }),
 
-// Create new team
-export const createTeam = publicProcedure
-  .input(CreateTeamDtoSchema)
-  .output(TeamRoSchema)
-  .handler(async ({ input }) => {
-    const { name, pokemonIds } = input
-
-    // Validate team composition
-    if (!TeamEntity.isValidTeam(pokemonIds)) {
-      throw new Error("Team must have exactly 6 Pokemon")
-    }
-
-    // Verify all Pokemon exist
-    const pokemon = await database.pokemon.findMany({
-      where: PokemonQuery.getByIdsWhere(pokemonIds),
-    })
-
-    if (pokemon.length !== 6) {
-      throw new Error("Some Pokemon not found")
-    }
-
-    // Calculate total power
-    const totalPower = TeamEntity.calculateTotalPower(pokemon)
-
-    // Create team and members in a transaction
-    const team = await database.$transaction(async (tx) => {
-      const newTeam = await tx.team.create({
-        data: {
-          name,
-          totalPower,
-        },
-      })
-
-      // Create team members
-      await tx.teamMember.createMany({
-        data: pokemonIds.map((pokemonId, index) => ({
-          teamId: newTeam.id,
-          pokemonId,
-          position: index + 1,
-        })),
-      })
-
-      return tx.team.findUniqueOrThrow({
-        where: { id: newTeam.id },
+  // Get team by ID
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .output(teamRoSchema)
+    .query(async ({ input, ctx }) => {
+      const team = await ctx.db.team.findUnique({
+        where: { id: input.id },
         include: TeamQuery.getInclude(),
       })
-    })
 
-    return TeamEntity.fromPrisma(team)
-  })
-
-// Update team
-export const updateTeam = publicProcedure
-  .input(UpdateTeamDtoSchema)
-  .output(TeamRoSchema)
-  .handler(async ({ input }) => {
-    const { id, name, pokemonIds } = input
-
-    const team = await database.$transaction(async (tx) => {
-      // Update team name if provided
-      if (name) {
-        await tx.team.update({
-          where: { id },
-          data: { name },
-        })
+      if (!team) {
+        throw new Error("Team not found")
       }
 
-      // Update team composition if provided
-      if (pokemonIds) {
-        if (!TeamEntity.isValidTeam(pokemonIds)) {
-          throw new Error("Team must have exactly 6 Pokemon")
-        }
+      return TeamEntity.fromPrisma(team)
+    }),
 
+  // Create new team with 6 Pokemon
+  create: publicProcedure
+    .input(
+      z.object({
+        name: z.string().min(1).max(50),
+        pokemonIds: z.array(z.string()).length(6),
+      })
+    )
+    .output(teamRoSchema)
+    .mutation(async ({ input, ctx }) => {
+      // Verify all Pokemon exist
+      const pokemon = await ctx.db.pokemon.findMany({
+        where: { id: { in: input.pokemonIds } },
+      })
+
+      if (pokemon.length !== 6) {
+        throw new Error("All 6 Pokemon must exist")
+      }
+
+      // Calculate total power
+      const totalPower = pokemon.reduce((sum, p) => sum + p.power, 0)
+
+      const team = await ctx.db.team.create({
+        data: {
+          name: input.name,
+          totalPower,
+          members: {
+            create: input.pokemonIds.map((pokemonId, index) => ({
+              pokemonId,
+              position: index,
+            })),
+          },
+        },
+        include: TeamQuery.getInclude(),
+      })
+
+      return TeamEntity.fromPrisma(team)
+    }),
+
+  // Update team
+  update: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string().min(1).max(50).optional(),
+        pokemonIds: z.array(z.string()).length(6).optional(),
+      })
+    )
+    .output(teamRoSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { id, name, pokemonIds } = input
+
+      let updateData: any = {}
+      
+      if (name) {
+        updateData.name = name
+      }
+
+      if (pokemonIds) {
         // Verify all Pokemon exist
-        const pokemon = await tx.pokemon.findMany({
-          where: PokemonQuery.getByIdsWhere(pokemonIds),
+        const pokemon = await ctx.db.pokemon.findMany({
+          where: { id: { in: pokemonIds } },
         })
 
         if (pokemon.length !== 6) {
-          throw new Error("Some Pokemon not found")
+          throw new Error("All 6 Pokemon must exist")
         }
 
-        // Delete existing members
-        await tx.teamMember.deleteMany({
+        // Calculate new total power
+        const totalPower = pokemon.reduce((sum, p) => sum + p.power, 0)
+        updateData.totalPower = totalPower
+
+        // Delete existing members and create new ones
+        await ctx.db.teamMember.deleteMany({
           where: { teamId: id },
         })
 
-        // Create new members
-        await tx.teamMember.createMany({
-          data: pokemonIds.map((pokemonId, index) => ({
-            teamId: id,
+        updateData.members = {
+          create: pokemonIds.map((pokemonId, index) => ({
             pokemonId,
-            position: index + 1,
+            position: index,
           })),
-        })
-
-        // Update total power
-        const totalPower = TeamEntity.calculateTotalPower(pokemon)
-        await tx.team.update({
-          where: { id },
-          data: { totalPower },
-        })
+        }
       }
 
-      return tx.team.findUniqueOrThrow({
+      const team = await ctx.db.team.update({
         where: { id },
+        data: updateData,
         include: TeamQuery.getInclude(),
       })
-    })
 
-    return TeamEntity.fromPrisma(team)
-  })
+      return TeamEntity.fromPrisma(team)
+    }),
 
-// Delete team
-export const deleteTeam = publicProcedure
-  .input(z.object({ id: z.string() }))
-  .output(z.object({ success: z.boolean() }))
-  .handler(async ({ input }) => {
-    await database.team.delete({
-      where: { id: input.id },
-    })
+  // Delete team
+  delete: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.db.team.delete({
+        where: { id: input.id },
+      })
 
-    return { success: true }
-  })
+      return { success: true }
+    }),
 
-export const teamRouter = {
-  getAllTeams,
-  getTeamById,
-  createTeam,
-  updateTeam,
-  deleteTeam,
-}
+  // Get user's teams (placeholder for when auth is added)
+  getUserTeams: publicProcedure
+    .input(z.object({ userId: z.string().optional() }))
+    .query(async ({ ctx }) => {
+      // For now, return all teams since we don't have user auth yet
+      const teams = await ctx.db.team.findMany({
+        include: TeamQuery.getInclude(),
+        orderBy: { createdAt: "desc" },
+      })
+
+      return teams.map((team) => TeamEntity.fromPrisma(team))
+    }),
+})

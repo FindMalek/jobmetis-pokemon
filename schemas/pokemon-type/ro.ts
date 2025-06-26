@@ -1,10 +1,10 @@
 import { z } from "zod"
 
 // Pokemon Type Enum Schema
-export const PokemonTypeEnumSchema = z.enum(["FIRE", "WATER", "GRASS"])
+export const pokemonTypeEnumSchema = z.enum(["FIRE", "WATER", "GRASS"])
 
 // Pokemon Type Return Object Schema
-export const PokemonTypeRoSchema = z.object({
+export const pokemonTypeRoSchema = z.object({
   id: z.string(),
   name: z.string(),
   displayName: z.string(),
@@ -12,14 +12,14 @@ export const PokemonTypeRoSchema = z.object({
 })
 
 // Pokemon Type with stats for admin/analytics
-export const PokemonTypeWithStatsRoSchema = PokemonTypeRoSchema.extend({
+export const pokemonTypeWithStatsRoSchema = pokemonTypeRoSchema.extend({
   pokemonCount: z.number(),
   averagePower: z.number(),
   averageLife: z.number(),
 })
 
-export type PokemonTypeEnum = z.infer<typeof PokemonTypeEnumSchema>
-export type PokemonTypeRo = z.infer<typeof PokemonTypeRoSchema>
+export type PokemonTypeEnum = z.infer<typeof pokemonTypeEnumSchema>
+export type PokemonTypeRo = z.infer<typeof pokemonTypeRoSchema>
 export type PokemonTypeWithStatsRo = z.infer<
-  typeof PokemonTypeWithStatsRoSchema
+  typeof pokemonTypeWithStatsRoSchema
 >
