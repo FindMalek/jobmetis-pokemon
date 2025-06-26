@@ -1,6 +1,9 @@
-import { PokemonTypeEntity, PokemonTypeQuery } from "@/entities/pokemon"
+import { PokemonTypeEntity, PokemonTypeQuery } from "@/entities"
 import { database } from "@/prisma/client"
-import { pokemonTypeRoSchema } from "@/schemas/pokemon-type"
+import {
+  pokemonTypeRoSchema,
+  typeEffectivenessChartRoSchema,
+} from "@/schemas/pokemon-type"
 import { os } from "@orpc/server"
 import { z } from "zod"
 
@@ -44,15 +47,7 @@ export const getTypeById = publicProcedure
 // Get type effectiveness chart
 export const getEffectivenessChart = publicProcedure
   .input(z.object({}))
-  .output(
-    z.array(
-      z.object({
-        attackingType: pokemonTypeRoSchema,
-        defendingType: pokemonTypeRoSchema,
-        factor: z.number(),
-      })
-    )
-  )
+  .output(typeEffectivenessChartRoSchema)
   .handler(async () => {
     const weaknesses = await database.weakness.findMany({
       include: {
@@ -62,8 +57,12 @@ export const getEffectivenessChart = publicProcedure
     })
 
     return weaknesses.map((weakness) => ({
-      attackingType: PokemonTypeEntity.fromPrisma(weakness.attackingType),
-      defendingType: PokemonTypeEntity.fromPrisma(weakness.defendingType),
+      attackingType: PokemonTypeEntity.fromBasicTypeData(
+        weakness.attackingType
+      ),
+      defendingType: PokemonTypeEntity.fromBasicTypeData(
+        weakness.defendingType
+      ),
       factor: weakness.factor,
     }))
   })

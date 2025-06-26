@@ -1,40 +1,23 @@
 import { Prisma } from "@prisma/client"
 
+import { PokemonQuery } from "../pokemon"
+
+export type TeamWithMembersDbData = Prisma.TeamGetPayload<{
+  include: ReturnType<typeof TeamQuery.getInclude>
+}>
+
 export class TeamQuery {
   // Include members with Pokemon and type data
-  static getInclude(): Prisma.TeamInclude {
+  static getInclude() {
     return {
       members: {
         include: {
           pokemon: {
-            include: {
-              type: true,
-            },
+            include: PokemonQuery.getInclude(),
           },
         },
-        orderBy: {
-          position: "asc",
-        },
       },
-    }
-  }
-
-  // Include for battle operations (same as getInclude but explicit)
-  static getBattleInclude(): Prisma.TeamInclude {
-    return {
-      members: {
-        include: {
-          pokemon: {
-            include: {
-              type: true,
-            },
-          },
-        },
-        orderBy: {
-          position: "asc",
-        },
-      },
-    }
+    } satisfies Prisma.TeamInclude
   }
 
   // Where clause for teams with full members

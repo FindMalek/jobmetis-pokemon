@@ -1,44 +1,25 @@
 import { BattleTeamRo, TeamListItemRo, TeamRo, TeamSummaryRo } from "@/schemas"
-import {
-  Pokemon as PrismaPokemon,
-  PokemonType as PrismaPokemonType,
-  Team as PrismaTeam,
-  TeamMember as PrismaTeamMember,
-} from "@prisma/client"
 
 import { PokemonEntity } from "../pokemon"
-
-// Team member with full Pokemon data
-type TeamMemberWithPokemon = PrismaTeamMember & {
-  pokemon: PrismaPokemon & {
-    type: PrismaPokemonType
-  }
-}
-
-// Team with members
-type TeamWithMembers = PrismaTeam & {
-  members: TeamMemberWithPokemon[]
-}
+import { TeamWithMembersDbData } from "./query"
 
 export class TeamEntity {
   // Convert Prisma model to RO
-  static fromPrisma(prismaTeam: TeamWithMembers): TeamRo {
-    const sortedMembers = prismaTeam.members
-      .sort((a, b) => a.position - b.position)
-      .map((member) => PokemonEntity.fromPrisma(member.pokemon))
-
+  static fromPrisma(prismaTeam: TeamWithMembersDbData): TeamRo {
     return {
       id: prismaTeam.id,
       name: prismaTeam.name,
       totalPower: prismaTeam.totalPower,
-      members: sortedMembers,
+      members: prismaTeam.members.map((member) =>
+        PokemonEntity.fromPrisma(member.pokemon)
+      ),
       createdAt: prismaTeam.createdAt,
       updatedAt: prismaTeam.updatedAt,
     }
   }
 
   // Convert to summary (lighter weight)
-  static fromPrismaToSummary(prismaTeam: TeamWithMembers): TeamSummaryRo {
+  static fromPrismaToSummary(prismaTeam: TeamWithMembersDbData): TeamSummaryRo {
     return {
       id: prismaTeam.id,
       name: prismaTeam.name,
@@ -50,13 +31,15 @@ export class TeamEntity {
   }
 
   // Convert to list item (for team lists)
-  static fromPrismaToListItem(prismaTeam: TeamWithMembers): TeamListItemRo {
+  static fromPrismaToListItem(
+    prismaTeam: TeamWithMembersDbData
+  ): TeamListItemRo {
     const memberPreviews = prismaTeam.members
       .slice(0, 3) // Take first 3 Pokemon
       .map((member) => ({
         name: member.pokemon.name,
         image: member.pokemon.image,
-        typeName: member.pokemon.type.name.toLowerCase(),
+        typeName: member.pokemon.type.name,
       }))
 
     return {

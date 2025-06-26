@@ -1,5 +1,9 @@
 import { PokemonTypeEnum, Prisma } from "@prisma/client"
 
+export type PokemonWithTypeDbData = Prisma.PokemonGetPayload<{
+  include: ReturnType<typeof PokemonQuery.getInclude>
+}>
+
 export class PokemonQuery {
   // Include type information
   static getInclude(): Prisma.PokemonInclude {
@@ -10,6 +14,52 @@ export class PokemonQuery {
           teamMemberships: true,
         },
       },
+    }
+  }
+
+  // Build where clause for complex queries
+  static buildWhereClause(params: {
+    search?: string
+    typeId?: string
+    minPower?: number
+    maxPower?: number
+  }): Prisma.PokemonWhereInput {
+    const conditions: Prisma.PokemonWhereInput[] = []
+
+    if (params.search) {
+      conditions.push(this.getByNameWhere(params.search))
+    }
+
+    if (params.typeId) {
+      conditions.push({
+        typeId: params.typeId,
+      })
+    }
+
+    if (params.minPower !== undefined && params.maxPower !== undefined) {
+      conditions.push(
+        this.getByPowerRangeWhere(params.minPower, params.maxPower)
+      )
+    }
+
+    return conditions.length > 0 ? { AND: conditions } : {}
+  }
+
+  // Build order by clause
+  static buildOrderByClause(
+    orderBy: "name" | "power" | "life" = "name"
+  ): Prisma.PokemonOrderByWithRelationInput[] {
+    return this.getOrderBy(orderBy)
+  }
+
+  // Build pagination options
+  static buildPaginationOptions(params: { page: number; limit: number }): {
+    skip: number
+    take: number
+  } {
+    return {
+      skip: (params.page - 1) * params.limit,
+      take: params.limit,
     }
   }
 

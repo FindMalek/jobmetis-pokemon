@@ -4,34 +4,26 @@ import {
   PokemonRo,
   PokemonWithStatsRo,
 } from "@/schemas"
-import {
-  Pokemon as PrismaPokemon,
-  PokemonType as PrismaPokemonType,
-} from "@prisma/client"
 
 import { PokemonTypeEntity } from "../pokemon-type"
-
-// Pokemon with type information
-type PokemonWithType = PrismaPokemon & {
-  type: PrismaPokemonType
-}
+import { PokemonWithTypeDbData } from "./query"
 
 export class PokemonEntity {
   // Convert Prisma model to RO
-  static fromPrisma(prismaPokemon: PokemonWithType): PokemonRo {
+  static fromPrisma(prismaPokemon: PokemonWithTypeDbData): PokemonRo {
     return {
       id: prismaPokemon.id,
       name: prismaPokemon.name,
       image: prismaPokemon.image,
       power: prismaPokemon.power,
       life: prismaPokemon.life,
-      type: PokemonTypeEntity.fromPrisma(prismaPokemon.type),
+      type: PokemonTypeEntity.fromBasicTypeData(prismaPokemon.type),
     }
   }
 
   // Convert to list item (lighter weight for lists)
   static fromPrismaToListItem(
-    prismaPokemon: PokemonWithType
+    prismaPokemon: PokemonWithTypeDbData
   ): PokemonListItemRo {
     return {
       id: prismaPokemon.id,
@@ -46,16 +38,14 @@ export class PokemonEntity {
 
   // Convert to Pokemon with stats
   static fromPrismaWithStats(
-    prismaPokemon: PokemonWithType & {
-      _count?: { teamMemberships: number }
-    }
+    prismaPokemon: PokemonWithTypeDbData
   ): PokemonWithStatsRo {
     const baseRo = this.fromPrisma(prismaPokemon)
     return {
       ...baseRo,
       rarity: this.getRarity(baseRo),
       totalStats: baseRo.power + baseRo.life,
-      usageCount: prismaPokemon._count?.teamMemberships || 0,
+      usageCount: prismaPokemon._count.teamMemberships,
     }
   }
 

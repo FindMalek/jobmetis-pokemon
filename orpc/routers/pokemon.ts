@@ -1,4 +1,4 @@
-import { PokemonEntity, PokemonQuery } from "@/entities/pokemon"
+import { PokemonEntity, PokemonQuery } from "@/entities"
 import { database } from "@/prisma/client"
 import {
   CreatePokemonDto,
@@ -34,8 +34,15 @@ export const getAllPokemon = publicProcedure
     })
   )
   .handler(async ({ input }) => {
-    const query = input || {}
-    const { search, typeId, minPower, maxPower, orderBy, page, limit } = query
+    const {
+      search,
+      typeId,
+      minPower,
+      maxPower,
+      orderBy,
+      page = 1,
+      limit = 10,
+    } = input || {}
 
     const prismaQuery = PokemonQuery.buildWhereClause({
       search,

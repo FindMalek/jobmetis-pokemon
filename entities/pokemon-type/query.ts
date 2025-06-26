@@ -1,5 +1,9 @@
 import { Prisma } from "@prisma/client"
 
+export type PokemonTypeWithPokemonDbData = Prisma.PokemonTypeGetPayload<{
+  include: ReturnType<typeof PokemonTypeQuery.getInclude>
+}>
+
 export class PokemonTypeQuery {
   // Basic include for Pokemon Type
   static getInclude(): Prisma.PokemonTypeInclude {

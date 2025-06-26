@@ -1,20 +1,11 @@
 import { PokemonTypeRo, PokemonTypeWithStatsRo } from "@/schemas"
-import {
-  PokemonTypeEnum,
-  PokemonType as PrismaPokemonType,
-} from "@prisma/client"
+import { PokemonTypeEnum } from "@prisma/client"
 
-// Return Object for Pokemon Type
-export interface PokemonTypeRo {
-  id: string
-  name: string
-  displayName: string
-  color: string
-}
+import { PokemonTypeWithPokemonDbData } from "./query"
 
 export class PokemonTypeEntity {
   // Convert Prisma model to RO
-  static fromPrisma(prismaType: PrismaPokemonType): PokemonTypeRo {
+  static fromPrisma(prismaType: PokemonTypeWithPokemonDbData): PokemonTypeRo {
     return {
       id: prismaType.id,
       name: this.enumToString(prismaType.name),
@@ -23,12 +14,22 @@ export class PokemonTypeEntity {
     }
   }
 
+  // Create basic type RO from minimal type data
+  static fromBasicTypeData(basicType: {
+    id: string
+    name: PokemonTypeEnum
+  }): PokemonTypeRo {
+    return {
+      id: basicType.id,
+      name: this.enumToDisplayName(basicType.name),
+      displayName: this.enumToDisplayName(basicType.name),
+      color: this.getTypeColor(basicType.name),
+    }
+  }
+
   // Convert Prisma model with stats to RO
   static fromPrismaWithStats(
-    prismaType: PrismaPokemonType & {
-      _count: { pokemon: number }
-      pokemon: Array<{ power: number; life: number }>
-    }
+    prismaType: PokemonTypeWithPokemonDbData
   ): PokemonTypeWithStatsRo {
     const avgPower =
       prismaType.pokemon.length > 0
@@ -70,8 +71,6 @@ export class PokemonTypeEntity {
         return "Water"
       case PokemonTypeEnum.GRASS:
         return "Grass"
-      default:
-        return enumValue.toLowerCase()
     }
   }
 

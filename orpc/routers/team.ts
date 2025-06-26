@@ -1,4 +1,4 @@
-import { TeamEntity, TeamQuery } from "@/entities/pokemon"
+import { TeamEntity, TeamQuery } from "@/entities"
 import { database } from "@/prisma/client"
 import { teamRoSchema } from "@/schemas/team"
 import { os } from "@orpc/server"

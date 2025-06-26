@@ -6,14 +6,7 @@ import {
   PokemonRo,
   TeamRo,
 } from "@/schemas"
-import {
-  Pokemon as PrismaPokemon,
-  PokemonType as PrismaPokemonType,
-  Weakness as PrismaWeakness,
-} from "@prisma/client"
-
-import { PokemonEntity } from "../pokemon"
-import { TeamEntity } from "../team"
+import { Weakness as PrismaWeakness } from "@prisma/client"
 
 export class BattleEntity {
   // Convert Pokemon to Battle Pokemon format
