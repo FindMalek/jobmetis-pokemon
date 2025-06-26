@@ -1,52 +1,49 @@
 import { SiteConfig } from "@/types"
 
 export const siteConfig: SiteConfig = {
-  name: "Zero Locker",
-  description: "Secure password management made simple.",
-  url: "https://www.0locker.com",
+  name: "Pokemon Battle Arena",
+  description: "Build teams of Pokemon and battle with type effectiveness mechanics.",
+  url: "https://jobmetis-pokemon.vercel.app",
   images: {
-    default: "https://www.0locker.com/og.png",
-    notFound: "https://www.0locker.com/not-found.png",
-    logo: "https://emojicdn.elk.sh/🔒?style=twitter",
+    default: "https://jobmetis-pokemon.vercel.app/og.png",
+    notFound: "https://jobmetis-pokemon.vercel.app/not-found.png",
+    logo: "https://emojicdn.elk.sh/⚔?style=twitter",
   },
   links: {
-    twitter: "https://twitter.com/foundmalek",
-    github: "https://github.com/findmalek/zero-locker",
+    twitter: "https://twitter.com/jobmetis",
+    github: "https://github.com/jobmetis/jobmetis-pokemon",
   },
   author: {
-    name: "Malek Gara-Hellal",
-    url: "https://findmalek.com",
-    email: "hi@findmalek.com",
-    github: "https://github.com/findmalek",
+    name: "JobMetis Pokemon App",
+    url: "https://jobmetis.com",
+    email: "contact@jobmetis.com",
+    github: "https://github.com/jobmetis",
   },
   keywords: [
-    "Password Management",
-    "Secure Storage",
-    "Password Generation",
-    "Account Details Management",
-    "Password History",
-    "Authentication",
-    "User Interface",
-    "Migration",
+    "Pokemon",
+    "Battle",
+    "Team Building",
+    "Type Effectiveness",
+    "Gaming",
+    "Simulation",
     "Next.js",
     "React",
-    "TypeScript",
+    "TypeScript", 
     "Prisma",
     "TailwindCSS",
-    "BetterAuth",
-    "Encryption",
-    "AES-256",
-    "Vercel",
+    "Supabase",
+    "PostgreSQL",
+    "ORPC",
   ],
 }
 
 export const notFoundMetadata = () => {
   return {
-    title: "Page not found",
-    description: "Page not found",
+    title: "Pokemon not found",
+    description: "The Pokemon you're looking for doesn't exist!",
     openGraph: {
-      title: `${siteConfig.name} | Page not found`,
-      description: "Page not found",
+      title: `${siteConfig.name} | Pokemon not found`,
+      description: "The Pokemon you're looking for doesn't exist!",
       images: [
         {
           url: siteConfig.images.notFound,
@@ -56,10 +53,10 @@ export const notFoundMetadata = () => {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${siteConfig.name} | Page not found`,
-      description: "Page not found",
+      title: `${siteConfig.name} | Pokemon not found`,
+      description: "The Pokemon you're looking for doesn't exist!",
       images: [siteConfig.images.notFound],
-      creator: "@findmalek",
+      creator: "@jobmetis",
     },
   }
 }

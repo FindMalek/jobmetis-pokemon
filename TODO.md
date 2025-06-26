@@ -1,115 +1,106 @@
-# TODO
+# Pokemon Battle Application - TODO List
 
-This file would contain a list of tasks that need to be completed.
-The format would be:
+## 🎯 Project Overview
+Transform the existing template into a Pokemon Battle Application with:
+- Pokemon management (view, edit, create teams)
+- Team building (6 Pokemon per team) 
+- Battle simulation with type effectiveness
+- Supabase database integration
 
-- [ ] Task 1 || Priority
-- [ ] Task 2 || Priority
-- [ ] Task 3 || Priority
+## 📋 Phase 1: Cleanup & Database Setup
+- [x] Create TODO.md for tracking
+- [ ] Delete unnecessary files and components
+- [ ] Set up Supabase database schema
+- [ ] Create Pokemon types table with Fire, Water, Grass
+- [ ] Create Pokemon table with at least 15 Pokemon (5 per type)
+- [ ] Create weakness chart table with type effectiveness
+- [ ] Create teams table for storing Pokemon teams
+- [ ] Write PostgreSQL functions for team operations
 
-> NOTE: The MVP is going to be released before the integration of oRPC and TanStack Query
-> So we can ship fast, and worry less about the DX
+## 📋 Phase 2: Backend API (ORPC/tRPC)
+- [ ] Update database schema in Prisma
+- [ ] Create Pokemon entities and queries
+- [ ] Create Pokemon ORPC routes
+- [ ] Create Team ORPC routes  
+- [ ] Create Battle simulation logic
+- [ ] Update authentication to work with Pokemon app
 
-## Tasks
+## 📋 Phase 3: Frontend Components
+- [ ] Clean up existing dashboard components
+- [ ] Create Pokemon list component
+- [ ] Create Pokemon card component
+- [ ] Create Pokemon edit form
+- [ ] Create team builder component
+- [ ] Create team list component
+- [ ] Create battle simulator component
+- [ ] Create battle display/results component
 
-- [ ] In the `CredentialMetadata` model changes
-      The `additionalInfo` field should be a JSON object, of the user's choice.
+## 📋 Phase 4: Pages & Navigation
+- [ ] Update routing for Pokemon app
+- [ ] Create Pokemon listing page
+- [ ] Create team management page
+- [ ] Create battle page
+- [ ] Update navigation/sidebar
+- [ ] Clean up auth pages if needed
 
-- [ ] For the `otherInfo` field in the `Credential` and `Card` models.
-      We should create a new model to store the information.
-      But for now the `Json` type is good enough.
-      Make sure to create a component to enter the key / value pairs.
-      TODO: Create a model for this. with encryption.
+## 📋 Phase 5: Styling & Polish
+- [ ] Design Pokemon-themed UI
+- [ ] Add Pokemon images/icons
+- [ ] Implement battle animations
+- [ ] Polish responsive design
+- [ ] Add loading states
 
-- [ ] Update Login and Register page
-      Make a better UI for the login page
-      Make a cool looking register page with a split layout like Supabase
+## 📋 Phase 6: Documentation & Deployment
+- [ ] Update README.md with setup instructions
+- [ ] Document battle algorithm
+- [ ] Explain database design choices
+- [ ] Add environment setup guide
+- [ ] Test entire application flow
 
-- [ ] Update the landing page to be more responsive
-      Also make sure the data of the cards is actually correct
+## 🗃️ Database Schema Requirements
+```sql
+-- pokemon_type table
+- id (uid)
+- name (text): Fire, Water, Grass
 
-- [ ] Automatic `CardSatuts` detection
-      e.g. if the date is due, then automatically its expired
+-- pokemon table  
+- id (uid)
+- name (text)
+- type (uid) -> pokemon_type.id
+- image (text)
+- power (number 10-100)
+- life (number 10-100)
 
-- [ ] Update the `SecretMetadata` model
-      We need to have link to `Platform` model.
+-- weakness table
+- id (uid) 
+- type1 (uid) -> pokemon_type.id (attacking)
+- type2 (uid) -> pokemon_type.id (defending) 
+- factor (float)
 
-- [ ] Update the `Secret` dialog
-      In each secret we should add a 'Pen' icon to edit more details about that secret
+-- teams table
+- id (uid)
+- name (text)
+- pokemon_ids (uid[]) - array of 6 pokemon IDs
+- total_power (number) - calculated field
+```
 
-- [ ] Update the `SecretMetadata` model
-      We need to have link to `Tags` model.
-      Should we really do this ?
+## ⚔️ Battle Logic Requirements
+- 1v1 combat until one team defeated
+- Life calculation: `remaining_life = current_life - opponent_power * type_factor`
+- Defeated Pokemon switch out automatically
+- Battle continues until one team has no Pokemon left
+- Winner is team with remaining Pokemon
 
-- [ ] Secret container must have these actions - [ ] Add a secret - [ ] Edit a secret - [ ] Delete a secret - [ ] View a secret - [ ] Copy a secret - [ ] Share a secret - [ ] Export .env file - [ ] Generate a .env.example file - [ ] Generate a env.ts file for the `t3-env` library
+## 🎨 UI Requirements
+- List all Pokemon with search/filter
+- Edit Pokemon stats
+- Build teams of exactly 6 Pokemon  
+- List teams ordered by total power
+- Battle simulator with round-by-round display
+- Show Pokemon status during battle
+- Display battle winner
 
-- [ ] In each model that uses CRUD actions, implement `isDeleted`
-      This would help in recovery and undo actions
-
-- [ ] Use services instead of `lib` files
-      We should create a new folder called `services` and move all the functions that are not related to the database to this folder.
-
-### Finished Tasks
-
-- [x] Change return types of the Server Actions || High
-      Currently we use ZOD.parse() in the server actions to validate the data.
-      Which is good, but I would like to use `entity.ts` and `query.ts` to validate the data - Each Prisma model would have a corresponding entity and query.
-
-- [x] Create a `verify` function for the `better-auth` library || High
-      This would be used to verify the user session in the server actions. We could use this in the client as well.
-
-- [x] We should change the `Credential`, like `loginUrl` is not neccesary. Because that could be stored in the `Platform` model.
-
-- [x] Finish editing the `DashboardAddCredentialDialog`
-
-- [x] Usage of 'logo.dev' for `Platforms` model
-
-- [x] Create a list Zod Object for these: - [x] `CardProvider` - [x] `CardType` - [x] `CardStatus`
-
-- [x] The `CardPaymentInputs` component changes
-      I would like to move this component to `/shared` folder.
-      Also if we couldnt recognize the card type, we should make the image a Select component, with the options being the `CardProvider` enum, and the user could either select the provider, or enter a new Card Provider.
-
-- [x] Implement the new `Secret` model from v0.dev
-      Link: https://v0.dev/chat/secrets-management-form-kgsnkNa1gw8
-
-- [x] Encyption of values ✅ COMPLETED
-      I noticed a lot of use to these `iv`, `encryptionKey`, `VALUE` fields.
-      I would like to create a Model to store these values. and use it in the `Credential` and `Card` models, or anything that needs encryption.
-
-        **IMPLEMENTATION COMPLETED:**
-        - ✅ Created new `EncryptedData` model in `prisma/schema/encryption.prisma`
-        - ✅ Updated `Card` model to use `cvvEncryption` and `numberEncryption` relations
-        - ✅ Updated `CardHistory` model to use encrypted data for old/new values
-        - ✅ Updated `Credential` model to use `passwordEncryption` relation
-        - ✅ Updated `CredentialHistory` model to use encrypted data for old/new password- [x] Refactor all of the database schemas
-        We need to refactor the database schemas to be more consistent.
-
-  s - ✅ Updated `Secret` model to use `valueEncryption` relation - ✅ Created new schemas in `schemas/encrypted-data.ts` - ✅ Created new entity in `entities/encrypted-data/` - ✅ Updated all server actions to use the new EncryptedData structure - ✅ Updated all seeders to create encrypted data properly - ✅ Created and applied database migration - ✅ All tests pass - database seeding works correctly
-
-- [x] In the `Credential` model changes
-      Change the `username` to `identifier` to make it more clear that it could be anything.
-
-- [x] The `CardHistory` is not being used.
-      Please remove it and any use for it.
-
-- [x] Refactor all of the database schemas
-      We need to refactor the database schemas to be more consistent.
-
-- [x] Make sure the `seeder` uses `createMany` instead of `create` records
-
-- [x] Update - [x] Update all the DTOs to include `metadata` fields
-      We want to have one call to create the data, not multiple calls from the client.t to have one call to create the data, not multiple calls from the client.
-
-- [x] Refactor the `EncryptedData` model
-      For each `query.ts` file, that its entity uses the `EncryptedData` model, we should create a new function that gets the `EncryptedData` model, and one dosent
-      We should think about it decrypting the data, in the server actions or entity.ts file or in the client.
-
-- [x] usage of `Metadata` aserver actions
-
-- [x] Update dependecies: 1. Update `prisma` 2. Update `pnpm`
-
-- [x] Implement oRPC instead of Next.js Server Actions || Low
-      This would let us scale into using API calls for external usage of the app, to be used in other apps.
-
-- [x] Use Tanstack Query for reloading data
+---
+**Target**: Impress in job interview with clean, professional Pokemon battle app
+**Time Budget**: ~4 hours (excluding initial DB setup)
+**Tech Stack**: Next.js, TypeScript, Tailwind, ORPC, Prisma, Supabase 

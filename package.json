@@ -1,7 +1,8 @@
 {
-  "name": "zero-locker",
+  "name": "jobmetis-pokemon",
   "version": "0.1.0",
   "private": true,
+  "description": "Pokemon Battle Application - Build teams and battle Pokemon with type effectiveness",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "pnpm db:generate && next build",
