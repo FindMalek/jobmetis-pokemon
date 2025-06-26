@@ -1,77 +1,181 @@
-![hero](github.png)
+# Pokemon Battle Arena ⚔️
 
-# Zero Locker
+A modern Pokemon battle application built with Next.js, where you can manage Pokemon, build teams, and simulate battles with type effectiveness mechanics.
 
-Zero Locker is a secure password management tool designed to store, retrieve, and manage account credentials and sensitive information efficiently. It provides a user-friendly platform with advanced features like password generation, secure storage, and easy migration from existing TXT files.
+## 🎮 Features
 
-## Features
+- **Pokemon Management**: View and edit Pokemon with stats (power, life, type)
+- **Team Building**: Create teams of exactly 6 Pokemon 
+- **Battle Simulation**: Simulate battles between teams with type effectiveness
+- **Type System**: Fire, Water, and Grass types with weakness/effectiveness chart
+- **Real-time Updates**: Fast, responsive UI with modern React patterns
 
-- **Secure Storage:** Encrypted storage for account credentials and sensitive information using Neon Database Provider with PostgreSQL.
-- **Password Generation:** Built-in tool for generating secure passwords.
-- **Account Details Management:** Store account details including usernames, passwords, descriptions, login page links, recovery emails, and creation dates.
-- **Password History:** Track changes made to passwords with timestamps.
-- **Authentication:** Secure authentication using BetterAuth with recommended authentication methods.
-- **User Interface:** Intuitive and mobile-friendly interface built with React, Next.js, Tailwind CSS, and shadcn.
-- **Migration:** Seamless migration from existing TXT files to the new system.
-- **Hosting:** Hosting on Vercel for free.
+## 🏗️ Tech Stack
 
-## Getting Started
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS, Radix UI, Shadcn/ui
+- **Backend**: ORPC (tRPC-like), Prisma ORM
+- **Database**: PostgreSQL (Supabase recommended)
+- **Authentication**: BetterAuth
+- **State Management**: React Query (TanStack Query)
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js and npm installed
-- PostgreSQL database
-- API keys for BetterAuth
+- Node.js 18+
+- pnpm (recommended) or npm
+- PostgreSQL database (Supabase account recommended)
 
-### Installation
+### 1. Clone and Install
 
-1. Clone the repository:
+\`\`\`bash
+git clone <repository-url>
+cd jobmetis-pokemon
+pnpm install
+\`\`\`
 
-   ```bash
-   git clone https://github.com/findmalek/zero-locker.git
-   cd zero-locker
-   ```
+### 2. Setup Environment Variables
 
-2. Install dependencies:
+Create a \`.env.local\` file in the root directory:
 
-   ```bash
-   pnpm install
-   ```
+\`\`\`env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/pokemon_battle_db"
 
-3. Set up environment variables:
-   Create a `.env` file in the root directory and add your database URL and API keys:
+# App
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+NODE_ENV="development"
 
-   ```
-   DATABASE_URL=postgresql://your_username:your_password@localhost:5432/zero-locker
-   ```
+# Auth
+BETTER_AUTH_SECRET="your-secret-key-min-10-chars"
 
-4. Run Prisma migrations:
+# Logo Dev (optional)
+LOGO_DEV_TOKEN="your-logo-dev-token"
+NEXT_PUBLIC_LOGO_DEV_TOKEN="your-logo-dev-token"
+\`\`\`
 
-   ```bash
-   pnpm db:migrate
-   ```
+### 3. Setup Database
 
-5. Start the development server:
-   ```bash
-   pnpm run dev
-   ```
+\`\`\`bash
+# Generate Prisma client
+pnpm db:generate
 
-## Usage
+# Push schema to database
+pnpm db:push
 
-1. **Login/Register:** Navigate to the login or register page to create an account or log in.
-2. **Add Accounts:** Use the dashboard to add new accounts with details like website name, website link, email address, and password.
-3. **Search Accounts:** Utilize the search combobox to find accounts by labels, descriptions, or other details.
-4. **Manage Accounts:** View, edit, and delete accounts from the account list.
-5. **Generate Passwords:** Use the built-in password generator to create secure passwords.
+# Seed database with Pokemon data
+pnpm db:reset-and-seed
+\`\`\`
 
-## Contributing
+### 4. Run Development Server
 
-Contributions are welcome! Please open an issue or submit a pull request.
+\`\`\`bash
+pnpm dev
+\`\`\`
 
-## License
+Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
-This project is licensed under the MIT License.
+## 📊 Database Schema
 
-## Contact
+### Core Tables
 
-For any inquiries, please contact [hi@findmalek.com](mailto:hi@findmalek.com).
+- **pokemon_type**: Pokemon types (Fire, Water, Grass) with enum values
+- **pokemon**: Individual Pokemon with stats and type relations
+- **weakness**: Type effectiveness chart (damage multipliers)
+- **team**: Pokemon teams with calculated total power
+- **team_member**: Junction table for team composition (6 Pokemon per team)
+
+### Battle Logic
+
+The battle system uses realistic Pokemon-style mechanics:
+
+1. **1v1 Combat**: Pokemon battle individually until defeated
+2. **Damage Calculation**: \`remaining_life = current_life - opponent_power * type_factor\`
+3. **Type Effectiveness**: 
+   - Fire vs Grass: 2.0x damage
+   - Water vs Fire: 2.0x damage  
+   - Grass vs Water: 2.0x damage
+   - Same type: 1.0x damage
+   - Weak matchups: 0.5x damage
+4. **Auto-switching**: Defeated Pokemon automatically switch out
+5. **Victory Condition**: Last team standing wins
+
+## 🎯 Development Status
+
+### ✅ Completed
+- [x] Database schema with enums and relations
+- [x] Fast seeding with createMany operations
+- [x] Entity layer with Prisma to RO converters
+- [x] Zod schemas for validation
+- [x] Basic ORPC router structure
+- [x] Project cleanup and configuration
+
+### 🚧 In Progress
+- [ ] Complete ORPC routes (Pokemon, Team, Battle)
+- [ ] Frontend components and pages
+- [ ] Battle simulation logic
+- [ ] UI/UX design
+
+### 📋 Todo
+- [ ] Pokemon listing and management pages
+- [ ] Team builder interface
+- [ ] Battle simulator with round-by-round display
+- [ ] Responsive design and animations
+- [ ] Error handling and loading states
+
+## 🔧 Available Scripts
+
+- \`pnpm dev\` - Start development server
+- \`pnpm build\` - Build for production
+- \`pnpm start\` - Start production server
+- \`pnpm lint\` - Run ESLint
+- \`pnpm format\` - Format code with Prettier
+- \`pnpm db:generate\` - Generate Prisma client
+- \`pnpm db:push\` - Push schema to database
+- \`pnpm db:studio\` - Open Prisma Studio
+- \`pnpm db:reset-and-seed\` - Reset and seed database
+
+## 🏛️ Architecture
+
+### Entity Layer
+- **Conversion Functions**: Prisma models → Return Objects (ROs)
+- **Query Helpers**: Reusable Prisma query builders
+- **Business Logic**: Type effectiveness, battle mechanics
+
+### API Layer (ORPC)
+- **Type-safe**: Full TypeScript support
+- **Validation**: Zod schemas for inputs/outputs
+- **Context**: User authentication and database access
+
+### Frontend Layer
+- **Components**: Reusable UI components with Shadcn/ui
+- **Pages**: Next.js App Router for routing
+- **Hooks**: Custom React Query hooks for data fetching
+
+## 🔒 Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| \`DATABASE_URL\` | PostgreSQL connection string | ✅ |
+| \`BETTER_AUTH_SECRET\` | Authentication secret key | ✅ |
+| \`NEXT_PUBLIC_APP_URL\` | Public app URL | ✅ |
+| \`LOGO_DEV_TOKEN\` | Logo development token | ❌ |
+
+## 🤝 Contributing
+
+This is a job interview project, but contributions and suggestions are welcome!
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📝 License
+
+[MIT License](LICENSE.md)
+
+---
+
+**Built with ❤️ for the Pokemon Battle Arena job interview project**

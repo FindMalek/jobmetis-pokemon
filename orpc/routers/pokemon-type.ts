@@ -1,53 +1,66 @@
-import { router, protectedProcedure } from "../context"
+import { database } from "@/prisma/client"
 import { PokemonTypeQuery, PokemonTypeEntity } from "@/entities"
 import { PokemonTypeRoSchema } from "@/schemas"
+import { os } from "@orpc/server"
 import { z } from "zod"
+import type { ORPCContext } from "../types"
 
-export const pokemonTypeRouter = router({
-  // Get all Pokemon types
-  getAll: protectedProcedure
-    .output(PokemonTypeRoSchema.array())
-    .query(async ({ ctx }) => {
-      const types = await ctx.db.pokemonType.findMany({
-        ...PokemonTypeQuery.getInclude(),
-        orderBy: PokemonTypeQuery.getOrderBy(),
-      })
+const baseProcedure = os.$context<ORPCContext>()
+const publicProcedure = baseProcedure.use(({ context, next }) => {
+  return next({ context })
+})
 
-      return types.map(type => PokemonTypeEntity.fromPrisma(type))
-    }),
+// Get all Pokemon types
+export const getAllTypes = publicProcedure
+  .input(z.object({}))
+  .output(PokemonTypeRoSchema.array())
+  .handler(async () => {
+    const types = await database.pokemonType.findMany({
+      ...PokemonTypeQuery.getInclude(),
+      orderBy: PokemonTypeQuery.getOrderBy(),
+    })
 
-  // Get type by ID
-  getById: protectedProcedure
-    .input(z.string())
-    .output(PokemonTypeRoSchema)
-    .query(async ({ ctx, input }) => {
-      const type = await ctx.db.pokemonType.findUniqueOrThrow({
-        where: { id: input },
-        ...PokemonTypeQuery.getInclude(),
-      })
+    return types.map(type => PokemonTypeEntity.fromPrisma(type))
+  })
 
-      return PokemonTypeEntity.fromPrisma(type)
-    }),
+// Get type by ID
+export const getTypeById = publicProcedure
+  .input(z.object({ id: z.string() }))
+  .output(PokemonTypeRoSchema)
+  .handler(async ({ input }) => {
+    const type = await database.pokemonType.findUniqueOrThrow({
+      where: { id: input.id },
+      ...PokemonTypeQuery.getInclude(),
+    })
 
-  // Get type effectiveness chart
-  getEffectivenessChart: protectedProcedure
-    .output(z.array(z.object({
-      attackingType: PokemonTypeRoSchema,
-      defendingType: PokemonTypeRoSchema,
-      factor: z.number(),
-    })))
-    .query(async ({ ctx }) => {
-      const weaknesses = await ctx.db.weakness.findMany({
-        include: {
-          attackingType: true,
-          defendingType: true,
-        },
-      })
+    return PokemonTypeEntity.fromPrisma(type)
+  })
 
-      return weaknesses.map(weakness => ({
-        attackingType: PokemonTypeEntity.fromPrisma(weakness.attackingType),
-        defendingType: PokemonTypeEntity.fromPrisma(weakness.defendingType),
-        factor: weakness.factor,
-      }))
-    }),
-}) 
+// Get type effectiveness chart
+export const getEffectivenessChart = publicProcedure
+  .input(z.object({}))
+  .output(z.array(z.object({
+    attackingType: PokemonTypeRoSchema,
+    defendingType: PokemonTypeRoSchema,
+    factor: z.number(),
+  })))
+  .handler(async () => {
+    const weaknesses = await database.weakness.findMany({
+      include: {
+        attackingType: true,
+        defendingType: true,
+      },
+    })
+
+    return weaknesses.map(weakness => ({
+      attackingType: PokemonTypeEntity.fromPrisma(weakness.attackingType),
+      defendingType: PokemonTypeEntity.fromPrisma(weakness.defendingType),
+      factor: weakness.factor,
+    }))
+  })
+
+export const pokemonTypeRouter = {
+  getAllTypes,
+  getTypeById,
+  getEffectivenessChart,
+} 
