@@ -1,28 +1,20 @@
 import { PrismaClient } from "@prisma/client"
 
-import { seedCards } from "./cards"
-import { seedContainers } from "./containers"
-import { seedCredentials } from "./credentials"
-import { seedPlatforms } from "./platforms"
-import { seedSecrets } from "./secrets"
-import { seedTags } from "./tags"
+import { seedPokemon } from "./pokemon"
 import { seedUsers } from "./users"
 
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log("🌱 Starting database seeding...")
+  console.log("🌱 Starting Pokemon Battle App database seeding...")
 
-  // Add all seeder functions here in the correct order
+  // Seed users for authentication
   await seedUsers(prisma)
-  await seedPlatforms(prisma)
-  await seedContainers(prisma)
-  await seedTags(prisma)
-  await seedCredentials(prisma)
-  await seedCards(prisma)
-  await seedSecrets(prisma)
+  
+  // Seed Pokemon data
+  await seedPokemon()
 
-  console.log("✅ Database seeding completed")
+  console.log("✅ Pokemon Battle App database seeding completed")
 }
 
 main()

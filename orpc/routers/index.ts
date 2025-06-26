@@ -1,19 +1,16 @@
-import { cardRouter } from "./card"
-import { containerRouter } from "./container"
-import { credentialRouter } from "./credential"
-import { platformRouter } from "./platform"
-import { secretRouter } from "./secret"
-import { tagRouter } from "./tag"
+import { router } from "../context"
+import { pokemonRouter } from "./pokemon"
+import { pokemonTypeRouter } from "./pokemon-type"
+import { teamRouter } from "./team"
+import { battleRouter } from "./battle"
 import { userRouter } from "./user"
 
-export const appRouter = {
-  cards: cardRouter,
-  credentials: credentialRouter,
-  secrets: secretRouter,
-  containers: containerRouter,
-  platforms: platformRouter,
-  tags: tagRouter,
-  users: userRouter,
-}
+export const appRouter = router({
+  user: userRouter,
+  pokemonType: pokemonTypeRouter,
+  pokemon: pokemonRouter,
+  team: teamRouter,
+  battle: battleRouter,
+})
 
 export type AppRouter = typeof appRouter

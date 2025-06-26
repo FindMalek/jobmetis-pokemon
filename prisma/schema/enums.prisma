@@ -1,0 +1,6 @@
+// Pokemon Type Enum
+enum PokemonTypeEnum {
+  FIRE
+  WATER
+  GRASS
+} 
