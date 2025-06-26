@@ -1,6 +1,6 @@
-import { PokemonTypeEntity, PokemonTypeQuery } from "@/entities"
+import { PokemonTypeEntity, PokemonTypeQuery } from "@/entities/pokemon"
 import { database } from "@/prisma/client"
-import { PokemonTypeRoSchema } from "@/schemas"
+import { pokemonTypeRoSchema } from "@/schemas/pokemon-type"
 import { os } from "@orpc/server"
 import { z } from "zod"
 
@@ -14,10 +14,12 @@ const publicProcedure = baseProcedure.use(({ context, next }) => {
 // Get all Pokemon types
 export const getAllTypes = publicProcedure
   .input(z.object({}))
-  .output(PokemonTypeRoSchema.array())
+  .output(pokemonTypeRoSchema.array())
   .handler(async () => {
     const types = await database.pokemonType.findMany({
-      ...PokemonTypeQuery.getInclude(),
+      include: {
+        ...PokemonTypeQuery.getInclude(),
+      },
       orderBy: PokemonTypeQuery.getOrderBy(),
     })
 
@@ -27,11 +29,13 @@ export const getAllTypes = publicProcedure
 // Get type by ID
 export const getTypeById = publicProcedure
   .input(z.object({ id: z.string() }))
-  .output(PokemonTypeRoSchema)
+  .output(pokemonTypeRoSchema)
   .handler(async ({ input }) => {
     const type = await database.pokemonType.findUniqueOrThrow({
       where: { id: input.id },
-      ...PokemonTypeQuery.getInclude(),
+      include: {
+        ...PokemonTypeQuery.getInclude(),
+      },
     })
 
     return PokemonTypeEntity.fromPrisma(type)
@@ -43,8 +47,8 @@ export const getEffectivenessChart = publicProcedure
   .output(
     z.array(
       z.object({
-        attackingType: PokemonTypeRoSchema,
-        defendingType: PokemonTypeRoSchema,
+        attackingType: pokemonTypeRoSchema,
+        defendingType: pokemonTypeRoSchema,
         factor: z.number(),
       })
     )

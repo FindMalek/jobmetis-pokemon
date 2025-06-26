@@ -1,5 +1,4 @@
 import Image from "next/image"
-import { RecentItemType, RecentItemTypeEnum } from "@/schemas/utils"
 import {
   AlertTriangle,
   ArrowDown,
@@ -198,34 +197,33 @@ export const Icons = {
   contractSigned: FileText,
   onboarding: UserCogIcon,
   joined: UserPlus,
-  save: SaveIcon,
-  question: HelpCircle,
-  clinic: HospitalIcon,
-  edit: PencilIcon,
-  userPlus: UserPlus,
-  leave: LogOut,
-  chevronDown: ChevronDown,
-  dashboard: LayoutDashboardIcon,
-  lifecycle: ListIcon,
-  arrowUpCircle: ArrowUpCircleIcon,
-  key: KeyIcon,
-  home: HomeIcon,
-  account: AtSignIcon,
-  info: Info,
-  refresh: RefreshCw,
-  login: LogIn,
-  lastPass: LastPassIcon,
+  referred: UserPlus,
+  purchased: CoinsIcon,
+  converted: Check,
+  churned: X,
+  reactivated: RefreshCw,
+  upgraded: ArrowUpCircleIcon,
+  downgraded: ArrowDown,
+  refunded: ArrowDown,
+  cancelled: X,
+  expired: Clock,
+  trialed: Check,
+  subscribed: Check,
+  unsubscribed: X,
+  suspended: X,
+  resumed: Check,
+  paused: Circle,
+  lastpass: LastPassIcon,
   hashicorp: HashiCorpIcon,
   github: GithubIcon,
-}
-
-export const getEntityIcon = (itemType: RecentItemType) => {
-  switch (itemType) {
-    case RecentItemTypeEnum.CREDENTIAL:
-      return <AtSignIcon className="h-4 w-4" />
-    case RecentItemTypeEnum.CARD:
-      return <CreditCard className="h-4 w-4" />
-    case RecentItemTypeEnum.SECRET:
-      return <KeyIcon className="h-4 w-4" />
-  }
+  home: HomeIcon,
+  dashboard: LayoutDashboardIcon,
+  key: KeyIcon,
+  save: SaveIcon,
+  info: Info,
+  list: ListIcon,
+  at: AtSignIcon,
+  logIn: LogIn,
+  chevronDown: ChevronDown,
+  hospital: HospitalIcon,
 }

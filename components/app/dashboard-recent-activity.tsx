@@ -1,111 +1,107 @@
 "use client"
 
-import { RecentItem } from "@/schemas/utils"
-
-import {
-  convertActivityTypeToString,
-  convertRecentItemTypeToString,
-} from "@/config/converter"
-import { siteConfig } from "@/config/site"
-import { formatDate, formatFullDate } from "@/lib/utils"
-
-import { AddItemDropdown } from "@/components/shared/add-item-dropdown"
-import { getEntityIcon, Icons } from "@/components/shared/icons"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardFooter,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+
+interface RecentItem {
+  id: string
+  type: "pokemon" | "team" | "battle"
+  name: string
+  createdAt: Date
+}
 
 interface DashboardRecentActivityProps {
-  recentItems: RecentItem[]
+  recentItems?: RecentItem[]
 }
 
 export function DashboardRecentActivity({
-  recentItems,
+  recentItems = [],
 }: DashboardRecentActivityProps) {
+  // Mock data for demonstration
+  const mockRecentItems: RecentItem[] = [
+    {
+      id: "1",
+      type: "pokemon",
+      name: "Charizard",
+      createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+    },
+    {
+      id: "2",
+      type: "team",
+      name: "Fire Team Alpha",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+    },
+    {
+      id: "3",
+      type: "battle",
+      name: "Battle vs Team Beta",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6), // 6 hours ago
+    },
+  ]
+
+  const displayItems = recentItems.length > 0 ? recentItems : mockRecentItems
+
+  function getTypeIcon(type: string) {
+    switch (type) {
+      case "pokemon":
+        return "🐾"
+      case "team":
+        return "👥"
+      case "battle":
+        return "⚔️"
+      default:
+        return "📝"
+    }
+  }
+
+  function formatTimeAgo(date: Date) {
+    const now = new Date()
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60)
+    )
+
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} minutes ago`
+    } else if (diffInMinutes < 1440) {
+      return `${Math.floor(diffInMinutes / 60)} hours ago`
+    } else {
+      return `${Math.floor(diffInMinutes / 1440)} days ago`
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-mono">Recent Activity</CardTitle>
+        <CardTitle>Recent Activity</CardTitle>
+        <CardDescription>Your latest Pokemon activities</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {recentItems.length > 0 ? (
-          <div className="space-y-4">
-            {recentItems.map((item: RecentItem) => (
-              <div
-                key={`${item.type}-${item.id}`}
-                className="hover:bg-muted-foreground/10 flex items-center justify-between space-x-4 rounded-md"
-              >
-                <div className="flex items-center space-x-4">
-                  <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-full`}
-                  >
-                    {getEntityIcon(item.type)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium leading-none">
-                      {item.name}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      {convertActivityTypeToString(item.activityType)} on{" "}
-                      {formatDate(item.lastActivityAt)}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center">
-                  <Badge variant="outline" className="text-xs ">
-                    {convertRecentItemTypeToString(item.type)}
-                  </Badge>
-                  <Button variant="ghost" size="icon">
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <Icons.info className="text-muted-foreground h-4 w-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <span className="cursor-default">
-                          {convertActivityTypeToString(item.activityType)} on{" "}
-                          {formatFullDate(item.lastActivityAt)}{" "}
-                        </span>
-                      </TooltipContent>
-                    </Tooltip>
-                  </Button>
-                </div>
+      <CardContent>
+        <div className="space-y-4">
+          {displayItems.map((item) => (
+            <div key={item.id} className="flex items-center space-x-4">
+              <div className="flex-shrink-0">
+                <span className="text-2xl">{getTypeIcon(item.type)}</span>
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <div className="bg-muted rounded-full p-3">
-              <Icons.logo className="text-muted-foreground h-6 w-6" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                  {item.name}
+                </p>
+                <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+                  {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                </p>
+              </div>
+              <div className="inline-flex items-center text-xs text-gray-500 dark:text-gray-400">
+                {formatTimeAgo(item.createdAt)}
+              </div>
             </div>
-            <h3 className="mt-4 text-lg font-semibold">No items yet</h3>
-            <p className="text-muted-foreground mt-2 text-sm">
-              Add your first item to get started with {siteConfig.name}
-            </p>
-            <div className="mt-4 w-[200px]">
-              <AddItemDropdown text="Add your first item" />
-            </div>
-          </div>
-        )}
+          ))}
+        </div>
       </CardContent>
-
-      {recentItems.length > 0 && (
-        <CardFooter>
-          <Button variant="outline" className="w-full" disabled>
-            View all activity (coming soon)
-          </Button>
-        </CardFooter>
-      )}
     </Card>
   )
 }

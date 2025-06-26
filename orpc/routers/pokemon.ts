@@ -1,153 +1,181 @@
-import { publicProcedure, router } from "../context"
 import { PokemonEntity, PokemonQuery } from "@/entities/pokemon"
+import { database } from "@/prisma/client"
 import {
   CreatePokemonDto,
   createPokemonDtoSchema,
-  pokemonRoSchema,
   PokemonQueryDto,
   pokemonQueryDtoSchema,
+  pokemonRoSchema,
   UpdatePokemonDto,
   updatePokemonDtoSchema,
 } from "@/schemas/pokemon"
+import { os } from "@orpc/server"
 import { z } from "zod"
 
-export const pokemonRouter = router({
-  // List all Pokemon with optional filtering
-  list: publicProcedure
-    .input(pokemonQueryDtoSchema.optional())
-    .query(async ({ input, ctx }) => {
-      const query = input || {}
-      const { search, typeId, minPower, maxPower, orderBy, page, limit } = query
+import type { ORPCContext } from "../types"
 
-      const prismaQuery = PokemonQuery.buildWhereClause({
-        search,
-        typeId,
-        minPower,
-        maxPower,
-      })
+const baseProcedure = os.$context<ORPCContext>()
+const publicProcedure = baseProcedure.use(({ context, next }) => {
+  return next({ context })
+})
 
-      const orderByClause = PokemonQuery.buildOrderByClause(orderBy)
-      const paginationOptions = PokemonQuery.buildPaginationOptions({
+// List all Pokemon with optional filtering
+export const getAllPokemon = publicProcedure
+  .input(pokemonQueryDtoSchema.optional())
+  .output(
+    z.object({
+      data: pokemonRoSchema.array(),
+      pagination: z.object({
+        page: z.number(),
+        limit: z.number(),
+        totalCount: z.number(),
+        totalPages: z.number(),
+      }),
+    })
+  )
+  .handler(async ({ input }) => {
+    const query = input || {}
+    const { search, typeId, minPower, maxPower, orderBy, page, limit } = query
+
+    const prismaQuery = PokemonQuery.buildWhereClause({
+      search,
+      typeId,
+      minPower,
+      maxPower,
+    })
+
+    const orderByClause = PokemonQuery.buildOrderByClause(orderBy)
+    const paginationOptions = PokemonQuery.buildPaginationOptions({
+      page,
+      limit,
+    })
+
+    const [pokemon, totalCount] = await Promise.all([
+      database.pokemon.findMany({
+        where: prismaQuery,
+        orderBy: orderByClause,
+        ...paginationOptions,
+        include: PokemonQuery.getInclude(),
+      }),
+      database.pokemon.count({
+        where: prismaQuery,
+      }),
+    ])
+
+    return {
+      data: pokemon.map((p) => PokemonEntity.fromPrisma(p)),
+      pagination: {
         page,
         limit,
-      })
+        totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+      },
+    }
+  })
 
-      const [pokemon, totalCount] = await Promise.all([
-        ctx.db.pokemon.findMany({
-          where: prismaQuery,
-          orderBy: orderByClause,
-          ...paginationOptions,
-          include: PokemonQuery.getInclude(),
-        }),
-        ctx.db.pokemon.count({
-          where: prismaQuery,
-        }),
-      ])
+// Get single Pokemon by ID
+export const getPokemonById = publicProcedure
+  .input(z.object({ id: z.string() }))
+  .output(pokemonRoSchema)
+  .handler(async ({ input }) => {
+    const pokemon = await database.pokemon.findUnique({
+      where: { id: input.id },
+      include: PokemonQuery.getInclude(),
+    })
 
-      return {
-        data: pokemon.map((p) => PokemonEntity.fromPrisma(p)),
-        pagination: {
-          page,
-          limit,
-          totalCount,
-          totalPages: Math.ceil(totalCount / limit),
-        },
-      }
-    }),
+    if (!pokemon) {
+      throw new Error("Pokemon not found")
+    }
 
-  // Get single Pokemon by ID
-  getById: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .output(pokemonRoSchema)
-    .query(async ({ input, ctx }) => {
-      const pokemon = await ctx.db.pokemon.findUnique({
-        where: { id: input.id },
-        include: PokemonQuery.getInclude(),
-      })
+    return PokemonEntity.fromPrisma(pokemon)
+  })
 
-      if (!pokemon) {
-        throw new Error("Pokemon not found")
-      }
+// Create new Pokemon
+export const createPokemon = publicProcedure
+  .input(createPokemonDtoSchema)
+  .output(pokemonRoSchema)
+  .handler(async ({ input }) => {
+    // Verify that the type exists
+    const typeExists = await database.pokemonType.findUnique({
+      where: { id: input.typeId },
+    })
 
-      return PokemonEntity.fromPrisma(pokemon)
-    }),
+    if (!typeExists) {
+      throw new Error("Pokemon type not found")
+    }
 
-  // Create new Pokemon
-  create: publicProcedure
-    .input(createPokemonDtoSchema)
-    .output(pokemonRoSchema)
-    .mutation(async ({ input, ctx }) => {
-      // Verify that the type exists
-      const typeExists = await ctx.db.pokemonType.findUnique({
-        where: { id: input.typeId },
+    const pokemon = await database.pokemon.create({
+      data: {
+        name: input.name,
+        image: input.image,
+        power: input.power,
+        life: input.life,
+        typeId: input.typeId,
+      },
+      include: PokemonQuery.getInclude(),
+    })
+
+    return PokemonEntity.fromPrisma(pokemon)
+  })
+
+// Update existing Pokemon
+export const updatePokemon = publicProcedure
+  .input(updatePokemonDtoSchema)
+  .output(pokemonRoSchema)
+  .handler(async ({ input }) => {
+    const { id, ...updateData } = input
+
+    // If typeId is being updated, verify it exists
+    if (updateData.typeId) {
+      const typeExists = await database.pokemonType.findUnique({
+        where: { id: updateData.typeId },
       })
 
       if (!typeExists) {
         throw new Error("Pokemon type not found")
       }
+    }
 
-      const pokemon = await ctx.db.pokemon.create({
-        data: {
-          name: input.name,
-          image: input.image,
-          power: input.power,
-          life: input.life,
-          typeId: input.typeId,
-        },
-        include: PokemonQuery.getInclude(),
-      })
+    const pokemon = await database.pokemon.update({
+      where: { id },
+      data: updateData,
+      include: PokemonQuery.getInclude(),
+    })
 
-      return PokemonEntity.fromPrisma(pokemon)
-    }),
+    return PokemonEntity.fromPrisma(pokemon)
+  })
 
-  // Update existing Pokemon
-  update: publicProcedure
-    .input(updatePokemonDtoSchema)
-    .output(pokemonRoSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { id, ...updateData } = input
+// Delete Pokemon
+export const deletePokemon = publicProcedure
+  .input(z.object({ id: z.string() }))
+  .output(z.object({ success: z.boolean() }))
+  .handler(async ({ input }) => {
+    await database.pokemon.delete({
+      where: { id: input.id },
+    })
 
-      // If typeId is being updated, verify it exists
-      if (updateData.typeId) {
-        const typeExists = await ctx.db.pokemonType.findUnique({
-          where: { id: updateData.typeId },
-        })
+    return { success: true }
+  })
 
-        if (!typeExists) {
-          throw new Error("Pokemon type not found")
-        }
-      }
+// Get Pokemon by type
+export const getPokemonByType = publicProcedure
+  .input(z.object({ typeId: z.string() }))
+  .output(pokemonRoSchema.array())
+  .handler(async ({ input }) => {
+    const pokemon = await database.pokemon.findMany({
+      where: { typeId: input.typeId },
+      include: PokemonQuery.getInclude(),
+      orderBy: { name: "asc" },
+    })
 
-      const pokemon = await ctx.db.pokemon.update({
-        where: { id },
-        data: updateData,
-        include: PokemonQuery.getInclude(),
-      })
+    return pokemon.map((p) => PokemonEntity.fromPrisma(p))
+  })
 
-      return PokemonEntity.fromPrisma(pokemon)
-    }),
-
-  // Delete Pokemon
-  delete: publicProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ input, ctx }) => {
-      await ctx.db.pokemon.delete({
-        where: { id: input.id },
-      })
-
-      return { success: true }
-    }),
-
-  // Get Pokemon by type
-  getByType: publicProcedure
-    .input(z.object({ typeId: z.string() }))
-    .query(async ({ input, ctx }) => {
-      const pokemon = await ctx.db.pokemon.findMany({
-        where: { typeId: input.typeId },
-        include: PokemonQuery.getInclude(),
-        orderBy: { name: "asc" },
-      })
-
-      return pokemon.map((p) => PokemonEntity.fromPrisma(p))
-    }),
-})
+export const pokemonRouter = {
+  getAllPokemon,
+  getPokemonById,
+  createPokemon,
+  updatePokemon,
+  deletePokemon,
+  getPokemonByType,
+}

@@ -1,13 +1,12 @@
-import { database } from "@/database/client"
+import { database } from "@/prisma/client"
 
 export const GET = async () => {
-  const newPage = await database.health.create({})
+  // Simple health check using Pokemon types table
+  const pokemonTypesCount = await database.pokemonType.count()
 
-  await database.health.delete({
-    where: {
-      id: newPage.id,
-    },
+  return Response.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    pokemonTypesCount,
   })
-
-  return new Response("OK", { status: 200 })
 }

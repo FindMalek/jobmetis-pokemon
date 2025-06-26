@@ -20,7 +20,7 @@ export function DashboardSiteHeader() {
       </div>
       <DashboardSearchCombobox />
       <ModeToggle />
-      <AddItemDropdown className="w-fit" />
+      <AddItemDropdown />
     </header>
   )
 }

@@ -24,7 +24,7 @@ export function MarketingHeaderDesktop() {
           href="/login"
           className={cn(buttonVariants({ variant: "default" }))}
         >
-          {isMobile ? <Icons.login /> : "Login"}
+          {isMobile ? <Icons.logIn /> : "Login"}
         </Link>
       </div>
     </header>

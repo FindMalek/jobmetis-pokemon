@@ -70,7 +70,7 @@ export function MarketingHero() {
                 }}
               >
                 {[
-                  <Icons.lastPass
+                  <Icons.lastpass
                     key="lastPass"
                     className="xs:size-10 size-12 opacity-80 sm:size-12 md:size-16 lg:size-20"
                   />,
