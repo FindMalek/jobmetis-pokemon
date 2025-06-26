@@ -23,12 +23,10 @@ async function getTypeEffectiveness(
   attackerTypeId: string,
   defenderTypeId: string
 ): Promise<number> {
-  const weakness = await database.weakness.findUnique({
+  const weakness = await database.weakness.findFirst({
     where: {
-      type1Id_type2Id: {
-        type1Id: attackerTypeId,
-        type2Id: defenderTypeId,
-      },
+      type1Id: attackerTypeId,
+      type2Id: defenderTypeId,
     },
   })
 

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { useStartBattle, useTeams } from "@/orpc/hooks"
 import type { BattleResultRo } from "@/schemas/battle"
 import { toast } from "sonner"
@@ -25,8 +26,22 @@ export function BattleArena() {
   const [battleResult, setBattleResult] = useState<BattleResultRo | null>(null)
   const [showBattleAnimation, setShowBattleAnimation] = useState(false)
 
+  const searchParams = useSearchParams()
+  const preSelectedTeam = searchParams.get("team")
+
   const { data: teams, isLoading: teamsLoading } = useTeams()
   const startBattleMutation = useStartBattle()
+
+  // Pre-select team from URL parameter
+  useEffect(() => {
+    if (preSelectedTeam && teams && !selectedTeam1) {
+      const team = teams.find(t => t.id === preSelectedTeam)
+      if (team) {
+        setSelectedTeam1(preSelectedTeam)
+        toast.success(`${team.name} selected for battle!`)
+      }
+    }
+  }, [preSelectedTeam, teams, selectedTeam1])
 
   const handleStartBattle = async () => {
     if (!selectedTeam1 || !selectedTeam2) {

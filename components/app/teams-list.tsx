@@ -1,10 +1,11 @@
 "use client"
 
-import { useCreateTeam, usePokemon, useTeams } from "@/orpc/hooks"
+import { useCreateTeam, usePokemon, useTeams, useUpdateTeam, useDeleteTeam } from "@/orpc/hooks"
 import { createTeamDtoSchema, type CreateTeamDto } from "@/schemas/team"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -35,6 +36,10 @@ export function TeamsList() {
     limit: 50,
   })
   const createTeamMutation = useCreateTeam()
+  const updateTeamMutation = useUpdateTeam()
+  const deleteTeamMutation = useDeleteTeam()
+
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null)
 
   const form = useForm<CreateTeamDto>({
     resolver: zodResolver(createTeamDtoSchema),
@@ -44,7 +49,16 @@ export function TeamsList() {
     },
   })
 
+  const editForm = useForm<CreateTeamDto>({
+    resolver: zodResolver(createTeamDtoSchema),
+    defaultValues: {
+      name: "",
+      pokemonIds: [],
+    },
+  })
+
   const selectedPokemonIds = form.watch("pokemonIds")
+  const editSelectedPokemonIds = editForm.watch("pokemonIds")
 
   const handleCreateTeam = async (data: CreateTeamDto) => {
     try {
@@ -55,6 +69,52 @@ export function TeamsList() {
       toast.error("Failed to create team")
       console.error(error)
     }
+  }
+
+  const handleEditTeam = (team: { id: string; name: string; members: Array<{ id: string }> }) => {
+    setEditingTeamId(team.id)
+    editForm.setValue("name", team.name)
+    editForm.setValue("pokemonIds", team.members.map((member) => member.id))
+  }
+
+  const handleUpdateTeam = async (data: CreateTeamDto) => {
+    if (!editingTeamId) return
+    
+    try {
+      await updateTeamMutation.mutateAsync({
+        id: editingTeamId,
+        name: data.name,
+        pokemonIds: data.pokemonIds,
+      })
+      toast.success("Team updated successfully!")
+      setEditingTeamId(null)
+      editForm.reset()
+    } catch (error) {
+      toast.error("Failed to update team")
+      console.error(error)
+    }
+  }
+
+  const handleDeleteTeam = async (teamId: string) => {
+    if (!confirm("Are you sure you want to delete this team?")) return
+    
+    try {
+      await deleteTeamMutation.mutateAsync(teamId)
+      toast.success("Team deleted successfully!")
+    } catch (error) {
+      toast.error("Failed to delete team")
+      console.error(error)
+    }
+  }
+
+  const handleBattleReady = (team: { id: string; name: string; members: Array<unknown> }) => {
+    if (team.members.length !== 6) {
+      toast.error("Team must have exactly 6 Pokemon to be battle ready!")
+      return
+    }
+    toast.success(`${team.name} is ready for battle!`)
+    // Navigate to battle arena with this team pre-selected
+    window.location.href = `/dashboard/battle?team=${team.id}`
   }
 
   const togglePokemonSelection = (pokemonId: string) => {
@@ -72,10 +132,32 @@ export function TeamsList() {
     }
   }
 
+  const toggleEditPokemonSelection = (pokemonId: string) => {
+    const currentIds = editForm.getValues("pokemonIds")
+
+    if (currentIds.includes(pokemonId)) {
+      editForm.setValue(
+        "pokemonIds",
+        currentIds.filter((id) => id !== pokemonId)
+      )
+    } else if (currentIds.length < 6) {
+      editForm.setValue("pokemonIds", [...currentIds, pokemonId])
+    } else {
+      toast.error("You can only select 6 Pokemon per team")
+    }
+  }
+
   const getSelectedPokemon = () => {
     if (!pokemonData?.data) return []
     return pokemonData.data.filter((pokemon) =>
       selectedPokemonIds.includes(pokemon.id)
+    )
+  }
+
+  const getEditSelectedPokemon = () => {
+    if (!pokemonData?.data) return []
+    return pokemonData.data.filter((pokemon) =>
+      editSelectedPokemonIds.includes(pokemon.id)
     )
   }
 
@@ -292,6 +374,191 @@ export function TeamsList() {
             </Form>
           </DialogContent>
         </Dialog>
+
+        {/* Edit Team Dialog */}
+        <Dialog open={!!editingTeamId} onOpenChange={(open) => !open && setEditingTeamId(null)}>
+          <DialogContent className="max-h-[90vh] w-[95vw] max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Edit Team</DialogTitle>
+            </DialogHeader>
+
+            <Form {...editForm}>
+              <form
+                onSubmit={editForm.handleSubmit(handleUpdateTeam)}
+                className="space-y-6"
+              >
+                {/* Team Name */}
+                <FormField
+                  control={editForm.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Team Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter team name..."
+                          maxLength={50}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Pokemon Selection */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label>
+                      Select Pokemon ({editSelectedPokemonIds.length}/6)
+                    </Label>
+                    <Badge
+                      variant={
+                        editSelectedPokemonIds.length === 6
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {editSelectedPokemonIds.length}/6 Selected
+                    </Badge>
+                  </div>
+
+                  {/* Selected Pokemon Preview */}
+                  {editSelectedPokemonIds.length > 0 && (
+                    <div className="bg-muted grid grid-cols-3 gap-2 rounded-lg p-3 sm:grid-cols-6">
+                      {getEditSelectedPokemon().map((pokemon, index) => (
+                        <div key={pokemon.id} className="relative">
+                          <img
+                            src={pokemon.image}
+                            alt={pokemon.name}
+                            className="aspect-square w-full rounded object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement
+                              target.src = `https://api.dicebear.com/7.x/shapes/svg?seed=${pokemon.name}`
+                            }}
+                          />
+                          <div className="bg-primary absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full">
+                            <span className="text-xs font-bold text-white">
+                              {index + 1}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                      {/* Empty slots */}
+                      {[...Array(6 - editSelectedPokemonIds.length)].map(
+                        (_, index) => (
+                          <div
+                            key={`empty-${index}`}
+                            className="border-muted-foreground/30 flex aspect-square items-center justify-center rounded border-2 border-dashed"
+                          >
+                            <span className="text-muted-foreground text-xs">
+                              Empty
+                            </span>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  )}
+
+                  <ScrollArea className="h-80">
+                    {pokemonLoading ? (
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        {[...Array(6)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="flex items-center space-x-3 rounded border p-3"
+                          >
+                            <Skeleton className="h-12 w-12 rounded" />
+                            <div className="flex-1">
+                              <Skeleton className="h-4 w-24" />
+                              <Skeleton className="mt-1 h-3 w-16" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        {pokemonData?.data.map((pokemon) => (
+                          <div
+                            key={pokemon.id}
+                            className={`flex cursor-pointer items-center space-x-3 rounded border p-3 transition-colors ${
+                              editSelectedPokemonIds.includes(pokemon.id)
+                                ? "border-primary bg-primary/5"
+                                : "hover:bg-muted/50"
+                            }`}
+                            onClick={() => toggleEditPokemonSelection(pokemon.id)}
+                          >
+                            <div className="relative">
+                              <img
+                                src={pokemon.image}
+                                alt={pokemon.name}
+                                className="h-12 w-12 rounded object-cover"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement
+                                  target.src = `https://api.dicebear.com/7.x/shapes/svg?seed=${pokemon.name}`
+                                }}
+                              />
+                              {editSelectedPokemonIds.includes(pokemon.id) && (
+                                <div className="bg-primary absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full">
+                                  <span className="text-xs font-bold text-white">
+                                    {editSelectedPokemonIds.indexOf(pokemon.id) + 1}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate font-medium">
+                                {pokemon.name}
+                              </p>
+                              <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                                <Badge
+                                  style={{
+                                    backgroundColor: pokemon.type.color,
+                                  }}
+                                  className="px-1 text-xs text-white"
+                                >
+                                  {pokemon.type.displayName}
+                                </Badge>
+                                <span>⚡{pokemon.power}</span>
+                                <span>❤️{pokemon.life}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </ScrollArea>
+                </div>
+
+                {/* Form Errors */}
+                {editForm.formState.errors.pokemonIds && (
+                  <p className="text-destructive text-sm">
+                    {editForm.formState.errors.pokemonIds.message}
+                  </p>
+                )}
+
+                {/* Update Button */}
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => editingTeamId && handleDeleteTeam(editingTeamId)}
+                    className="flex-1"
+                  >
+                    Delete Team
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={updateTeamMutation.isPending}
+                    className="flex-1"
+                  >
+                    {updateTeamMutation.isPending ? "Updating..." : "Update Team"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Teams Grid */}
@@ -341,10 +608,19 @@ export function TeamsList() {
 
                 {/* Actions */}
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => handleEditTeam(team)}
+                  >
                     Edit Team
                   </Button>
-                  <Button size="sm" className="flex-1">
+                  <Button 
+                    size="sm" 
+                    className="flex-1"
+                    onClick={() => handleBattleReady(team)}
+                  >
                     Battle Ready
                   </Button>
                 </div>

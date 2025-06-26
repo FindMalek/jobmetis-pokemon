@@ -16,6 +16,9 @@ export class TeamQuery {
             include: PokemonQuery.getInclude(),
           },
         },
+        orderBy: {
+          position: "asc", // Order by position to ensure consistent team member order
+        },
       },
     } satisfies Prisma.TeamInclude
   }

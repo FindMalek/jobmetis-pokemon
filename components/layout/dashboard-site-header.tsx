@@ -1,7 +1,6 @@
 "use client"
 
 import { DashboardDynamicBreadcrumb } from "@/components/layout/dashboard-dynamic-breadcrumb"
-import { DashboardSearchCombobox } from "@/components/layout/dashboard-search-combobox"
 import { AddItemDropdown } from "@/components/shared/add-item-dropdown"
 import { ModeToggle } from "@/components/shared/mode-toggle"
 import { Separator } from "@/components/ui/separator"
@@ -18,7 +17,6 @@ export function DashboardSiteHeader() {
         />
         <DashboardDynamicBreadcrumb />
       </div>
-      <DashboardSearchCombobox />
       <ModeToggle />
       <AddItemDropdown />
     </header>

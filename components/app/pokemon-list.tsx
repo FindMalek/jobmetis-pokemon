@@ -21,7 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 export function PokemonList() {
   const [filters, setFilters] = useState<PokemonQueryDto>({
     search: "",
-    typeId: "",
+    typeId: undefined,
     minPower: undefined,
     maxPower: undefined,
     orderBy: "name",
@@ -38,7 +38,7 @@ export function PokemonList() {
   ) => {
     setFilters((prev) => ({
       ...prev,
-      [key]: value,
+      [key]: value === "all" ? undefined : value,
       page: key === "page" ? (value as number) : 1,
     }))
   }
@@ -46,7 +46,7 @@ export function PokemonList() {
   const clearFilters = () => {
     setFilters({
       search: "",
-      typeId: "",
+      typeId: undefined,
       minPower: undefined,
       maxPower: undefined,
       orderBy: "name",
@@ -123,14 +123,14 @@ export function PokemonList() {
             <div className="space-y-2">
               <Label htmlFor="type">Type</Label>
               <Select
-                value={filters.typeId || ""}
+                value={filters.typeId || "all"}
                 onValueChange={(value) => handleFilterChange("typeId", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   {types?.map((type) => (
                     <SelectItem key={type.id} value={type.id}>
                       <div className="flex items-center gap-2">
