@@ -1,1 +1,5 @@
 export * from "./use-users"
+export * from "./use-pokemon"
+export * from "./use-teams"
+export * from "./use-battles"
+export * from "./use-pokemon-types"

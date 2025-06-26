@@ -2,7 +2,6 @@ import { MarketingFeatures } from "@/components/app/marketing-features"
 import { MarketingFooter } from "@/components/app/marketing-footer"
 import { MarketingHeaderDesktop } from "@/components/app/marketing-header-desktop"
 import { MarketingHero } from "@/components/app/marketing-hero"
-import { MarketingHowItWorks } from "@/components/app/marketing-how-it-works"
 import { MarketingStats } from "@/components/app/marketing-stats"
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern"
 
@@ -23,7 +22,6 @@ export default function Home() {
         <MarketingHero />
         <MarketingStats />
         <MarketingFeatures />
-        <MarketingHowItWorks />
         <MarketingFooter />
       </div>
     </div>

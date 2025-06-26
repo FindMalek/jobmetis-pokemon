@@ -71,6 +71,7 @@ import {
   SquareTerminal,
   Stethoscope,
   SunMedium,
+  Sword,
   ToggleRightIcon,
   Trash,
   TrendingDown,
@@ -226,4 +227,5 @@ export const Icons = {
   logIn: LogIn,
   chevronDown: ChevronDown,
   hospital: HospitalIcon,
+  sword: Sword,
 }

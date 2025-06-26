@@ -12,11 +12,11 @@ export function MarketingFeatures() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 text-center sm:mb-16">
           <h2 className="mb-3 text-2xl font-bold sm:mb-4 sm:text-3xl md:text-4xl">
-            Why Choose Zero-Locker?
+            Master the Pokemon Battle Arena
           </h2>
           <p className="text-muted-foreground mx-auto max-w-lg text-base sm:max-w-2xl sm:text-lg">
-            Built with security, privacy, and user experience in mind.
-            Everything you need to protect your digital identity.
+            Everything you need to become the ultimate Pokemon trainer. Build
+            teams, battle strategically, and climb the ranks.
           </p>
         </div>
 
@@ -24,12 +24,12 @@ export function MarketingFeatures() {
           <Card className="hover:border-primary/20 border-2 transition-colors">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Icons.shield className="text-primary h-8 w-8" />
-                <CardTitle>Military-Grade Encryption</CardTitle>
+                <Icons.zap className="h-8 w-8 text-yellow-500" />
+                <CardTitle>Pokemon Collection</CardTitle>
               </div>
               <CardDescription>
-                Your data is protected with AES-256 encryption, the same
-                standard used by governments and financial institutions.
+                Browse through 15 unique Pokemon across Fire, Water, and Grass
+                types. Each with unique stats, abilities, and strategic value.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -37,12 +37,12 @@ export function MarketingFeatures() {
           <Card className="hover:border-primary/20 border-2 transition-colors">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Icons.globe className="text-primary h-8 w-8" />
-                <CardTitle>100% Open Source</CardTitle>
+                <Icons.users className="h-8 w-8 text-blue-500" />
+                <CardTitle>Team Building</CardTitle>
               </div>
               <CardDescription>
-                Full transparency with publicly available code. Audit,
-                contribute, and trust in a community-driven solution.
+                Create teams of exactly 6 Pokemon. Build balanced squads with
+                strategic type coverage for optimal battle performance.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -50,12 +50,12 @@ export function MarketingFeatures() {
           <Card className="hover:border-primary/20 border-2 transition-colors">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Icons.zap className="text-primary h-8 w-8" />
-                <CardTitle>Lightning Fast</CardTitle>
+                <Icons.sword className="h-8 w-8 text-red-500" />
+                <CardTitle>Strategic Battles</CardTitle>
               </div>
               <CardDescription>
-                Built with modern web technologies for instant access to your
-                passwords and data across all devices.
+                Engage in turn-based battles with type effectiveness mechanics.
+                Fire beats Grass, Water beats Fire, Grass beats Water.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -63,12 +63,12 @@ export function MarketingFeatures() {
           <Card className="hover:border-primary/20 border-2 transition-colors">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Icons.key className="text-primary h-8 w-8" />
-                <CardTitle>Password Management</CardTitle>
+                <Icons.barChart className="h-8 w-8 text-green-500" />
+                <CardTitle>Advanced Statistics</CardTitle>
               </div>
               <CardDescription>
-                Generate strong passwords, store credentials securely, and
-                autofill login forms with ease.
+                Track your battle performance, win rates, and team
+                effectiveness. Analyze your strategies and improve your skills.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -76,12 +76,12 @@ export function MarketingFeatures() {
           <Card className="hover:border-primary/20 border-2 transition-colors">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Icons.creditCard className="text-primary h-8 w-8" />
-                <CardTitle>Secure Card Storage</CardTitle>
+                <Icons.globe className="h-8 w-8 text-purple-500" />
+                <CardTitle>Type Effectiveness</CardTitle>
               </div>
               <CardDescription>
-                Safely store credit cards, bank details, and payment information
-                with encrypted card data protection.
+                Master the rock-paper-scissors mechanic of Pokemon types. Learn
+                matchups and build teams with optimal type coverage.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -89,12 +89,12 @@ export function MarketingFeatures() {
           <Card className="hover:border-primary/20 border-2 transition-colors">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Icons.lock className="text-primary h-8 w-8" />
-                <CardTitle>Secret Management</CardTitle>
+                <Icons.sparkles className="h-8 w-8 text-pink-500" />
+                <CardTitle>Real-time Battles</CardTitle>
               </div>
               <CardDescription>
-                Securely store API keys, environment variables, and sensitive
-                configuration data with encrypted access control.
+                Experience fast-paced battles with instant results. Watch
+                round-by-round combat with detailed damage calculations.
               </CardDescription>
             </CardHeader>
           </Card>

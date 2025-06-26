@@ -60,19 +60,19 @@ export function DashboardSidebar({ user, ...props }: DashboardSidebarProps) {
               <SidebarSeparator />
 
               <DashboardSidebarMenuItemComponent
-                href="/dashboard/accounts"
-                icon={<Icons.user className="h-4 w-4" />}
-                label="Accounts"
+                href="/dashboard/pokemon"
+                icon={<Icons.zap className="h-4 w-4" />}
+                label="Pokemon"
               />
               <DashboardSidebarMenuItemComponent
-                href="/dashboard/cards"
-                icon={<Icons.creditCard className="h-4 w-4" />}
-                label="Payment Cards"
+                href="/dashboard/teams"
+                icon={<Icons.users className="h-4 w-4" />}
+                label="Teams"
               />
               <DashboardSidebarMenuItemComponent
-                href="/dashboard/secrets"
-                icon={<Icons.key className="h-4 w-4" />}
-                label="Secure Notes"
+                href="/dashboard/battle"
+                icon={<Icons.sword className="h-4 w-4" />}
+                label="Battle Arena"
               />
 
               <SidebarSeparator />

@@ -1,7 +1,6 @@
 import { type Variants } from "motion/react"
 
 import { MarketingWaitlistForm } from "@/components/app/marketing-waitlist-form"
-import { Icons } from "@/components/shared/icons"
 import { AnimatedGroup } from "@/components/ui/animated-group"
 import { Badge } from "@/components/ui/badge"
 import { TextLoop } from "@/components/ui/text-loop"
@@ -36,11 +35,13 @@ export function MarketingHero() {
               variant="secondary"
               className="px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm"
             >
-              🏗️ Currently in Private Beta
+              ⚔️ Pokemon Battle Arena
             </Badge>
 
             <h1 className="xs:text-3xl inline-flex flex-col items-center justify-center gap-1.5 text-4xl font-bold leading-tight sm:flex-row sm:items-baseline sm:gap-2.5 sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
-              <span className="text-center sm:text-left">The open source</span>
+              <span className="text-center sm:text-left">
+                Build your ultimate
+              </span>
               <TextLoop
                 transition={{
                   type: "spring",
@@ -70,21 +71,23 @@ export function MarketingHero() {
                 }}
               >
                 {[
-                  <Icons.lastpass
-                    key="lastPass"
-                    className="xs:size-10 size-12 opacity-80 sm:size-12 md:size-16 lg:size-20"
-                  />,
-                  <Icons.hashicorp
-                    key="hashicorp"
-                    className="xs:size-10 size-12 opacity-80 sm:size-12 md:size-16 lg:size-20 dark:invert"
-                  />,
+                  <span key="team" className="text-red-500">
+                    🔥 Team
+                  </span>,
+                  <span key="squad" className="text-blue-500">
+                    💧 Squad
+                  </span>,
+                  <span key="roster" className="text-green-500">
+                    🌿 Roster
+                  </span>,
                 ]}
               </TextLoop>
-              <span className="text-center sm:text-left">alternative</span>
+              <span className="text-center sm:text-left">and battle!</span>
             </h1>
 
             <p className="text-muted-foreground xs:max-w-sm xs:text-lg max-w-xs text-base leading-relaxed sm:max-w-xl md:max-w-2xl md:text-xl">
-              The open source alternative to traditional password managers.
+              Create teams of 6 Pokemon, master type effectiveness, and compete
+              in strategic battles.
             </p>
 
             <div className="w-full max-w-md sm:max-w-lg">
